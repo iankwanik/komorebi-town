@@ -52,6 +52,19 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 #adCover{position:fixed;inset:0;z-index:50;background:rgba(28,37,65,.55);display:grid;place-items:center}
 #adCover .panel{padding:14px 22px;font-weight:800}
 .mcard .adnote{background:var(--paper-2);border-radius:10px;padding:8px 10px;font-size:12.5px;color:var(--ink)}
+#goalsBtn{display:flex;align-items:center;gap:5px;height:40px;box-sizing:border-box;padding:0 11px 0 7px;font-weight:800;font-size:12.5px;cursor:pointer;position:relative}
+#goalsBtn svg{width:22px;height:22px}
+#goalsDot{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;border-radius:9px;background:var(--vermilion);color:#fff;font-size:10.5px;display:grid;place-items:center;border:2px solid var(--ink);padding:0 3px;box-sizing:border-box}
+.kbal{display:inline-flex;align-items:center;gap:6px;background:#fff4c2;border:2px solid var(--ink);border-radius:999px;padding:3px 12px 3px 6px;font-weight:800;font-size:13px;margin:0 0 10px}
+.kbal svg{width:20px;height:20px}
+.gbar{display:inline-block;width:56px;height:6px;border-radius:4px;background:var(--paper-2);border:1px solid var(--ink);overflow:hidden;vertical-align:middle;margin-right:6px}
+.gbar i{display:block;height:100%;background:var(--gold)}
+.board.goals .tw{white-space:normal}
+.board.goals li.bonus{background:#fff8e1}
+.astars{font-family:var(--body)!important;font-size:11px!important;color:#c9971f!important;letter-spacing:-1px}
+.astars em{font-style:normal;color:#c7c2b2}
+.gnote{font-size:12.5px!important;margin:0 0 10px!important}
+.gnote .tab{padding:3px 9px;font-size:11.5px;margin:2px}
 #friendsBtn{width:40px;height:40px;display:grid;place-items:center;padding:0;cursor:pointer}
 #friendsBtn svg{width:23px;height:23px}
 #eventCard{display:flex;align-items:center;gap:10px;padding:8px 10px 8px 8px;pointer-events:auto;background:#2b2238;color:#fbeedd;max-width:300px;box-sizing:border-box}
@@ -154,6 +167,9 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .sstars small{color:var(--ink-2);font-weight:700}
 .btn.sup{margin-top:7px;padding:5px 10px;font-size:12px;white-space:normal;text-align:left;line-height:1.3}
 .btn.sup.locked{background:var(--paper-2);color:var(--ink-2)}
+.btn.sup.fin{background:#fff;color:var(--ink);margin-left:6px}
+.evnote.koban{background:#5a4512}
+.evnote.koban b{color:#f6d36a}
 .sbtns .btn{padding:5px 10px;font-size:12px}
 
 #toast{position:fixed;top:30%;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:999px;font-weight:700;font-size:13px;z-index:20;max-width:calc(100% - 40px);text-align:center;pointer-events:none;box-shadow:3px 3px 0 rgba(28,37,65,.25)}
@@ -169,6 +185,8 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .mbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:4px}
 .levelstamp{display:inline-grid;place-items:center;width:64px;height:64px;border-radius:50%;background:var(--vermilion);color:#fff;font-family:var(--display);font-size:28px;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
 @media (max-width:480px){
+  #goalsBtn span{display:none}
+  #goalsBtn{padding:0 9px}
   .stat{font-size:13px;padding:4px 8px 4px 5px}
   .stat svg{width:19px;height:19px}
   .xpbar{width:60px}
@@ -192,6 +210,7 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
     <div class="panel stat" title="Tourists"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="3" fill="#7fb8d0" stroke="#1c2541" stroke-width="2"/><path d="M8 7l1.5-2.5h5L16 7" fill="#7fb8d0" stroke="#1c2541" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.4" fill="#fff" stroke="#1c2541" stroke-width="2"/></svg><span id="tour">0</span></div>
     <div class="panel stat" title="Staff in use / residents"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" fill="#f0cfae" stroke="#1c2541" stroke-width="2"/><path d="M3.5 20c0-4 2.5-6 5.5-6s5.5 2 5.5 6z" fill="#5d8f4c" stroke="#1c2541" stroke-width="2" stroke-linejoin="round"/><circle cx="16.5" cy="9" r="2.6" fill="#f0cfae" stroke="#1c2541" stroke-width="1.8"/><path d="M15 14.2c3.3-.4 5.6 1.6 5.6 5.8h-4" fill="#c8572f" stroke="#1c2541" stroke-width="1.8" stroke-linejoin="round"/></svg><span id="staff">0</span></div>
     <div class="hud-right">
+      <button class="panel" id="goalsBtn" aria-label="Goals"><svg viewBox="0 0 24 24"><path d="M5 4h14v11a7 7 0 0 1-14 0z" fill="#d6432b" stroke="#1c2541" stroke-width="2" stroke-linejoin="round"/><path d="M12 7.5l1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4z" fill="#f6d36a"/></svg><span>Goals</span><b id="goalsDot" hidden>0</b></button>
       <button class="panel" id="friendsBtn" aria-label="Friends" hidden><svg viewBox="0 0 24 24"><circle cx="8.5" cy="8" r="3.2" fill="#f0cfae" stroke="#1c2541" stroke-width="2"/><path d="M3 20c0-4 2.4-6 5.5-6s5.5 2 5.5 6z" fill="#7fb8d0" stroke="#1c2541" stroke-width="2" stroke-linejoin="round"/><path d="M17 7v6M14 10h6" stroke="#d6432b" stroke-width="2.4" stroke-linecap="round"/></svg></button>
       <button class="panel" id="boardBtn" aria-label="Leaderboard" hidden><svg viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0z" fill="#f0b429" stroke="#1c2541" stroke-width="2" stroke-linejoin="round"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3" fill="none" stroke="#1c2541" stroke-width="2"/><path d="M12 13v4M8.5 20h7v-1.5a1.5 1.5 0 0 0-1.5-1.5h-4a1.5 1.5 0 0 0-1.5 1.5z" fill="#f0b429" stroke="#1c2541" stroke-width="2" stroke-linejoin="round"/></svg></button>
       <button class="panel off" id="cloudBtn" hidden><svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 9.1 4.5 4.5 0 0 0 7 18z" fill="#fff" stroke="#1c2541" stroke-width="2" stroke-linejoin="round"/></svg><span id="cloudTxt">Sign in</span></button>
@@ -229,7 +248,7 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 <div id="chip" class="panel tray" hidden><span id="chipTxt"></span><button id="chipDone" class="btn">Done</button></div>
 <div id="sheet" class="panel tray" hidden>
   <canvas id="sThumb" width="144" height="120"></canvas>
-  <div class="sbody"><div class="stitle" id="sName"></div><div class="sstars" id="sStars"></div><div class="sstat" id="sStat"></div><div class="sbar" id="sBarW"><div id="sBar"></div></div><button class="btn primary sup" id="sUp" hidden></button></div>
+  <div class="sbody"><div class="stitle" id="sName"></div><div class="sstars" id="sStars"></div><div class="sstat" id="sStat"></div><div class="sbar" id="sBarW"><div id="sBar"></div></div><button class="btn primary sup" id="sUp" hidden></button><button class="btn sup fin" id="sFin" hidden></button></div>
   <div class="sbtns"><button id="sMove" class="btn">Move</button><button id="sSell" class="btn danger">Remove</button></div>
 </div>
 <div id="visitBar" class="panel" hidden><div class="vinfo"><div class="qlabel">Visiting</div><div class="stitle" id="vName"></div><div class="sstat" id="vStat"></div></div><button class="btn primary" id="vHelp">Help</button><button class="btn" id="vHome">Go home</button></div>
@@ -379,10 +398,17 @@ const DEFS={
  obake:{n:'Lantern Ghost',cat:'decor',tab:'event',ev:1,cost:0,candy:60,lvl:1,appeal:10,ht:42},
  haunted:{n:'Haunted House',cat:'decor',tab:'event',ev:1,w:2,h:2,cost:0,candy:250,lvl:1,appeal:60,ht:66},
  goldpump:{n:'Golden Pumpkin',cat:'decor',tab:'event',ev:1,gold:1,cost:0,candy:0,lvl:1,appeal:40,ht:34},
+ goldtorii:{n:'Golden Torii',cat:'decor',lm:1,cost:8000,lvl:8,appeal:70,ht:48},
+ fireworks:{n:'Fireworks Tower',cat:'decor',lm:1,w:2,h:2,cost:15000,lvl:9,appeal:120,ht:72},
+ bigsakura:{n:'Grand Sakura',cat:'decor',lm:1,w:2,h:2,cost:20000,lvl:10,appeal:160,ht:106},
+ goldpavilion:{n:'Golden Pavilion',cat:'decor',lm:1,w:2,h:2,cost:40000,lvl:12,appeal:300,ht:80},
+ maneki:{n:'Lucky Cat Statue',cat:'decor',tab:'treasure',cost:0,koban:10,lvl:1,appeal:25,ht:36},
+ golddaruma:{n:'Golden Daruma',cat:'decor',tab:'treasure',cost:0,koban:15,lvl:1,appeal:35,ht:32},
+ dragon:{n:'Dragon Fountain',cat:'decor',tab:'treasure',w:2,h:2,cost:0,koban:40,lvl:1,appeal:120,ht:60},
  road:{n:'Stone Road',cat:'road',cost:5,lvl:1,ht:0},
 };
 for(const k in DEFS){const d=DEFS[k];d.id=k;d.w=d.w||1;d.h=d.h||1;}
-const CATS=[['event','Halloween'],['farm','Farms'],['shop','Shops'],['home','Homes'],['decor','Decor'],['road','Roads']];
+const CATS=[['event','Halloween'],['farm','Farms'],['shop','Shops'],['home','Homes'],['decor','Decor'],['road','Roads'],['treasure','Treasure']];
 /* ---------- Halloween Festival: 29 Oct - 11 Nov 2026 (Melbourne time) ---------- */
 const EV_START=Date.UTC(2026,9,28,13), EV_END=Date.UTC(2026,10,11,13);
 const eventOn=()=>{const n=Date.now();return n>=EV_START&&n<EV_END;};
@@ -393,10 +419,13 @@ const STAR_B=[10,25,50], STAR_F=[20,50,100], LV_MULT=[1,1.3,1.7], RES_MULT=[1,1.
 const starsOf=(n,th)=>n>=th[2]?3:n>=th[1]?2:n>=th[0]?1:0;
 const starTxt=n=>'★'.repeat(n)+'☆'.repeat(3-n);
 const lvOf=b=>b.lv||1;
+const KOBAN='<svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="7.5" ry="10" fill="#f0c33c" stroke="#1c2541" stroke-width="2"/><path d="M8.5 7.5h7M8 11h8M8 14.5h8M8.5 18h7" stroke="#b8860b" stroke-width="1.3"/><rect x="10.2" y="9.6" width="3.6" height="4.8" rx=".6" fill="#fff4c2" stroke="#b8860b" stroke-width="1"/></svg>';
+const perkInc=()=>(S.perk&&S.perk.inc)||0, perkEn=()=>(S.perk&&S.perk.en)||0;
+const builtTotal=()=>Object.values(S.c.built||{}).reduce((a,v)=>a+v,0);
 const bStars=b=>starsOf(b.cnt||0,STAR_B);
 const fStars=t=>starsOf((S.mast&&S.mast[t])||0,STAR_F);
-function earnOf(b){const d=DEFS[b.type];return Math.round(d.earn*D.mult*(1+.1*bStars(b))*LV_MULT[lvOf(b)-1]);}
-function rentOf(b){const d=DEFS[b.type];return Math.round(d.rent*(1+.1*bStars(b))*LV_MULT[lvOf(b)-1]);}
+function earnOf(b){const d=DEFS[b.type];return Math.round(d.earn*D.mult*(1+.1*bStars(b))*LV_MULT[lvOf(b)-1]*(1+.05*perkInc()));}
+function rentOf(b){const d=DEFS[b.type];return Math.round(d.rent*(1+.1*bStars(b))*LV_MULT[lvOf(b)-1]*(1+.05*perkInc()));}
 function resOf(b){const d=DEFS[b.type];return d.res?Math.round(d.res*RES_MULT[lvOf(b)-1]):0;}
 function yieldOf(d){return Math.round(d.yield*YIELD_MULT[fStars(d.id)]);}
 /* upgrade price follows what the building earns now, so it stays a real choice at every stage */
@@ -427,7 +456,7 @@ function newState(){
 if(!S)S=newState();
 function normalize(o){o.friends=Array.isArray(o.friends)?o.friends:[];o.helped=(o.helped&&typeof o.helped==='object')?o.helped:{};
   o.c=o.c||{built:{},harvest:0,supply:0,collect:0,rent:0,expand:0};o.c.built=o.c.built||{};
-  o.b=(o.b||[]).filter(b=>DEFS[b.type]);if(!Array.isArray(o.roads)||o.roads.length!==MAP*MAP)o.roads=new Array(MAP*MAP).fill(0);return o;}
+  o.b=(o.b||[]).filter(b=>DEFS[b.type]);o.koban=o.koban|0;o.perk=o.perk||{inc:0,en:0};o.ach=o.ach||{};o.titles=Array.isArray(o.titles)?o.titles:[];if(!Array.isArray(o.roads)||o.roads.length!==MAP*MAP)o.roads=new Array(MAP*MAP).fill(0);return o;}
 normalize(S);
 let visiting=null,homeS=null;
 /* ---------- platform: CrazyGames or the web ---------- */
@@ -509,7 +538,7 @@ function totalXp(){let t=S.xp;for(let l=1;l<S.lvl;l++)t+=need(l);return t;}
 async function pushBoard(){
   if(!cloudUser||!window.cloud||!S.name||visiting)return;
   recompute();
-  const e={name:S.name,town:S.town||'Komorebi Town',level:S.lvl|0,totalXp:totalXp()|0,tourists:D.tourists|0,buildings:S.b.length|0,code:myCode()};
+  const e={name:S.name,town:S.town||'Komorebi Town',title:S.title||'',level:S.lvl|0,totalXp:totalXp()|0,tourists:D.tourists|0,buildings:S.b.length|0,code:myCode()};
   const k=JSON.stringify(e);if(k===lastBoard)return;
   try{await window.cloud.saveBoard(e);lastBoard=k;}
   catch(err){console.warn('Leaderboard update failed',err);if(!boardWarned){boardWarned=true;toast('Leaderboard could not update. Check the Firestore rules.');}}
@@ -524,7 +553,7 @@ async function fillBoard(card){
     if(!list.isConnected||f!==boardField)return;
     if(!rows.length){list.innerHTML='<li class="empty">No mayors yet. Be the first!</li>';return;}
     const me=window.cloud.uid();
-    list.innerHTML=rows.map((r,i)=>'<li class="'+(r.uid===me?'me':'')+'"'+(r.uid===me?'':' data-i="'+i+'"')+'><span class="rk">'+(i+1)+'</span><span class="who"><span class="nm">'+esc(r.name||'Mayor')+(r.uid===me?' (you)':'')+'</span><span class="tw">'+esc(r.town||'')+'</span></span><span class="val">'+(f==='level'?'Lv '+(r.level|0):num(r.tourists|0)+' <small>tourists</small>')+'</span></li>').join('');
+    list.innerHTML=rows.map((r,i)=>'<li class="'+(r.uid===me?'me':'')+'"'+(r.uid===me?'':' data-i="'+i+'"')+'><span class="rk">'+(i+1)+'</span><span class="who"><span class="nm">'+esc(r.name||'Mayor')+(r.uid===me?' (you)':'')+'</span><span class="tw">'+esc(r.town||'')+(r.title?' · '+esc(r.title):'')+'</span></span><span class="val">'+(f==='level'?'Lv '+(r.level|0):num(r.tourists|0)+' <small>tourists</small>')+'</span></li>').join('');
     list.querySelectorAll('li[data-i]').forEach(li=>li.onclick=()=>{const r=rows[+li.dataset.i];nextModal();openPlayer(r);});
   }catch(e){console.warn(e);if(list.isConnected)list.innerHTML='<li class="empty">Could not load the leaderboard. Try again soon.</li>';}
 }
@@ -547,7 +576,7 @@ function openPlayer(r){
   const isF=S.friends.some(f=>f.uid===r.uid),btns=[{label:'Back',fn:()=>openBoard()}];
   if(!isF)btns.push({label:'Add friend',fn:()=>{if(!cloudUser){openAccount();return;}if(!S.name){openName(true);return;}addFriend(r);}});
   btns.push({label:'Visit town',cls:'primary',fn:()=>visitFriend(r.uid,r.name)});
-  modal('<div class="big">'+TANUKI+'</div><h2>Mayor '+esc(r.name||'')+'</h2><p>'+esc(r.town||'')+'<br>Level '+(r.level|0)+' · '+num(r.tourists|0)+' tourists</p>',btns);}
+  modal('<div class="big">'+TANUKI+'</div><h2>Mayor '+esc(r.name||'')+'</h2><p>'+(r.title?'<b>'+esc(r.title)+'</b><br>':'')+esc(r.town||'')+'<br>Level '+(r.level|0)+' · '+num(r.tourists|0)+' tourists</p>',btns);}
 function addFriend(r){
   if(r.uid===window.cloud.uid()){toast("That's you!");return false;}
   if(S.friends.some(f=>f.uid===r.uid)){toast('Mayor '+(r.name||'')+' is already your friend.');return false;}
@@ -587,7 +616,7 @@ document.getElementById('friendsBtn').onclick=openFriends;
 /* ---------- visiting ---------- */
 function showVisitUI(on){$('#top').hidden=on;$('#dock').hidden=on;$('#visitBar').hidden=!on;if(on)updVisit();}
 function updVisit(){if(!visiting)return;recompute();
-  $('#vName').textContent='Mayor '+visiting.name;$('#vStat').textContent=(visiting.town?visiting.town+' · ':'')+'Level '+S.lvl+' · '+num(D.tourists)+' tourists';
+  $('#vName').textContent='Mayor '+visiting.name+(visiting.title?' · '+visiting.title:'');$('#vStat').textContent=(visiting.town?visiting.town+' · ':'')+'Level '+S.lvl+' · '+num(D.tourists)+' tourists';
   const done=homeS.helped[visiting.uid]===today();const b=$('#vHelp');b.disabled=done||visiting.busy;b.textContent=done?'Helped today':'Help';}
 async function visitFriend(uid,name){
   if(!window.cloud)return;if(!cloudUser){openAccount();return;}
@@ -598,7 +627,7 @@ async function visitFriend(uid,name){
     if(!fs||fs.v!==1){toast('This mayor has no town saved yet.');return;}
     if(visiting)goHome();
     dirty=true;flush();pushCloud();
-    homeS=S;S=normalize(fs);visiting={uid,name:clean(fs.name||name,20)||'Mayor',town:clean(fs.town,24)};
+    homeS=S;S=normalize(fs);visiting={uid,name:clean(fs.name||name,20)||'Mayor',town:clean(fs.town,24),title:clean(fs.title,24)};
     setMode(null);hideSheet();closeDrawer();rebuild();walkers.length=0;ghosts.length=0;floats.length=0;fitCam();showVisitUI(true);
   }catch(e){console.warn(e);toast('Could not visit right now. Check the Firestore rules.');}}
 function goHome(){
@@ -611,7 +640,7 @@ async function helpFriend(){
   v.busy=true;updVisit();
   try{
     await window.cloud.sendHelp(v.uid,{fromName:clean(hs.name,20)||'A mayor',kind:'help'});
-    hs.helped[v.uid]=today();const y=20+hs.lvl*10;hs.yen+=y;hs.xp+=5;let msg='+¥'+num(y)+' and +5 XP';
+    hs.helped[v.uid]=today();hs.c.help=(hs.c.help||0)+1;const y=20+hs.lvl*10;hs.yen+=y;hs.xp+=5;let msg='+¥'+num(y)+' and +5 XP';
     if(eventOn()){if(!hs.ev||hs.ev.id!=='hw2026')hs.ev={id:'hw2026',candy:0,total:0,claimed:[],gold:false,seen:false};hs.ev.candy+=8;hs.ev.total+=8;msg+=' and +8 candy';}
     v.helped=true;dirty=true;cloudDirty=true;hs.savedAt=Date.now();
     toast('You helped Mayor '+v.name+'! '+msg);
@@ -651,7 +680,7 @@ window.addEventListener('cloud-ready',()=>{
 
 const ev=t=>S.c.built[t]||0;
 const need=l=>Math.round(30*Math.pow(l,1.6));
-const maxE=()=>20+(S.lvl-1)*2;
+const maxE=()=>20+(S.lvl-1)*2+2*perkEn();
 
 /* ---------- grid ---------- */
 let occ=new Int32Array(MAP*MAP), roadTiles=[], forest=[];
@@ -1143,6 +1172,77 @@ function stallUp(b,n,col){const L=lvOf(b);if(L===1)return;const x=b.x,y=b.y;
     garland(x+.2,y+.78,x+.8,y+.78,25,4,['#d6432b','#f6e7b8',col]);garland(x+.8,y+.26,x+.8,y+.78,25,3,['#f6e7b8','#d6432b']);
     const p=P(x+.82,y+.82,0);ln(p,[p[0],p[1]-30],'#5a391f',1.2);ell(p[0],p[1]-33,6,6,'#f6efdc','#1c2541');ell(p[0],p[1]-33,3.4,3.4,col,false);}}
 
+/* ---------- landmarks and treasure decorations ---------- */
+Object.assign(DR,{
+ goldtorii(b,n){const x=b.x,y=b.y;shadowT(x+.5,y+.5,12);
+  const g=.6+.4*Math.sin(n/500);const p=P(x+.5,y+.5,24);ell(p[0],p[1],26,16,'rgba(255,214,90,'+(.1+.06*g).toFixed(3)+')',false);
+  box(x+.13,y+.43,.14,.14,0,3,'#2b2b2e');box(x+.73,y+.43,.14,.14,0,3,'#2b2b2e');
+  box(x+.16,y+.46,.08,.08,3,33,GOLD);box(x+.76,y+.46,.08,.08,3,33,GOLD);
+  box(x+.06,y+.475,.88,.05,26,3.5,GOLD);box(x+.47,y+.48,.06,.04,29.5,6,GOLD);
+  fy(x+.42,x+.58,y+.522,28,34,'#1c2541');const t=P(x+.5,y+.524,31);ell(t[0],t[1],1.8,1.8,GOLD,false);
+  box(x,y+.44,1,.12,35.5,3.5,GOLD);box(x-.03,y+.43,1.06,.14,39,3.5,'#2b2b2e');
+  for(let i=0;i<3;i++)twinkle(x+.2+i*.3,y+.5,40+i*3,n,i*.31+.1);},
+ fireworks(b,n){const x=b.x,y=b.y;shadowT(x+1,y+1,20);
+  box(x+.2,y+.2,1.6,1.6,0,3,'#a8a294');
+  for(const [a,c] of [[.55,.55],[1.45,.55],[.55,1.45],[1.45,1.45]])box(x+a-.04,y+c-.04,.08,.08,3,46,'#7a4e33');
+  box(x+.5,y+.5,1,1,22,3,'#8a5a36');box(x+.55,y+.55,.9,.9,46,4,'#8a5a36');
+  ln(P(x+.55,y+1.45,6),P(x+1.45,y+1.45,22),'#6b4426',1.4);ln(P(x+1.45,y+.55,6),P(x+1.45,y+1.45,22),'#6b4426',1.4);
+  ln(P(x+.55,y+1.45,26),P(x+1.45,y+1.45,46),'#6b4426',1.4);ln(P(x+1.45,y+.55,26),P(x+1.45,y+1.45,46),'#6b4426',1.4);
+  box(x+.82,y+.82,.36,.36,50,8,'#d6432b');hip(x+.78,y+.78,.44,.44,58,8,.05,'#2f3d4f');
+  for(let i=0;i<3;i++)box(x+.65+i*.3,y+.68,.06,.06,50,9,['#2f6db0','#f0b429','#6a9b42'][i]);
+  garland(x+.55,y+1.45,x+1.45,y+1.45,44,5,['#d6432b','#f6e7b8','#f0b429']);
+  const cols=['#ff6b6b','#ffd166','#7bdff2','#c77dff','#80ed99'];
+  for(let k=0;k<3;k++){const T=2600,ph=((n+k*870)%T)/T,c=P(x+1+(k-1)*.35,y+1-(k-1)*.2,80+k*14);
+    if(ph<.22){const r=P(x+1+(k-1)*.35,y+1-(k-1)*.2,60+ph/.22*(20+k*14));ell(r[0],r[1],1.4,3,'#fff4c2',false);}
+    else{const q=(ph-.22)/.78,R=6+q*22,col=cols[(k+Math.floor(n/T))%5];ctx.globalAlpha=Math.max(0,1-q);
+      for(let i=0;i<12;i++){const a=i/12*Math.PI*2;ell(c[0]+Math.cos(a)*R,c[1]+Math.sin(a)*R*.85+q*q*8,1.8,1.8,col,false);}ctx.globalAlpha=1;}}},
+ bigsakura(b,n){const x=b.x,y=b.y;shadowT(x+1,y+1,30);
+  box(x+.35,y+.35,1.3,1.3,0,3,'#b9b2a2');poly([P(x+.45,y+.45,3),P(x+1.55,y+.45,3),P(x+1.55,y+1.55,3),P(x+.45,y+1.55,3)],'#8fbf6a',false);
+  const c=P(x+1,y+1,3);ctx.beginPath();ctx.moveTo(c[0]-9,c[1]);ctx.quadraticCurveTo(c[0]-5,c[1]-20,c[0]-3,c[1]-38);ctx.lineTo(c[0]+5,c[1]-38);ctx.quadraticCurveTo(c[0]+6,c[1]-18,c[0]+10,c[1]);ctx.closePath();ctx.fillStyle='#5b4030';ctx.fill();ctx.strokeStyle=OUT;ctx.lineWidth=.8;ctx.stroke();
+  ln([c[0]-2,c[1]-34],[c[0]-30,c[1]-56],'#5b4030',5);ln([c[0]+3,c[1]-34],[c[0]+32,c[1]-54],'#5b4030',5);ln([c[0],c[1]-36],[c[0]+2,c[1]-66],'#5b4030',4);
+  box(x+.98,y+1.04,.08,.04,22,2,'#f4ead2');
+  const pk=['#f4a9bd','#f9c8d5','#ef97ae','#fbd6df'];
+  const spots=[[.25,.8,44,18],[1.75,1.2,44,18],[.55,.4,54,19],[1.5,.5,56,19],[.5,1.45,50,18],[1.45,1.5,50,18],[1,.55,70,20],[.65,1,76,19],[1.35,1,76,19],[1,1.45,64,17],[1,1,92,18],[.8,.75,98,13],[1.2,1.25,96,13]];
+  spots.forEach(([a,bb,z,r],i)=>blob(x+a,y+bb,z,r,pk[i%4]));
+  for(let i=0;i<10;i++){const ph=((n/3200)+i/10)%1,px=x+.3+hash(i,3)*1.4,py=y+.3+hash(3,i)*1.4,p=P(px+ph*.3,py,70*(1-ph)+3);ell(p[0]+Math.sin(n/300+i)*3,p[1],1.6,1,pk[i%4],false);}},
+ goldpavilion(b,n){const x=b.x,y=b.y;
+  box(x+.05,y+.05,1.9,1.9,0,2,'#a8a294');poly([P(x+.12,y+.12,2),P(x+1.88,y+.12,2),P(x+1.88,y+1.88,2),P(x+.12,y+1.88,2)],'#4e9fb4','#3d8197');
+  for(let i=0;i<5;i++){const a=n/1600+i*1.3,p=P(x+1+Math.cos(a)*.78,y+1+Math.sin(a)*.78,2);ell(p[0],p[1],5,1.6,'rgba(255,255,255,.35)',false);}
+  box(x+.45,y+.45,1.1,1.1,2,4,'#b9b2a2');
+  box(x+.55,y+.55,.9,.9,6,14,'#f2ece0');for(let k=0;k<5;k++){const a=x+.55+k*.225;ln(P(a,y+1.452,6),P(a,y+1.452,20),'#6b4426',1.6);ln(P(x+1.452,y+.55+k*.225,6),P(x+1.452,y+.55+k*.225,20),'#6b4426',1.6);}
+  hip(x+.55,y+.55,.9,.9,20,4,.14,'#2b2b2e');
+  box(x+.6,y+.6,.8,.8,24,13,'#e8b830');fy(x+.7,x+1.3,y+1.402,27,34,'#f6d36a');fx(y+.7,y+1.3,x+1.402,27,34,'#d9a520');
+  hip(x+.6,y+.6,.8,.8,37,4,.13,'#2b2b2e');
+  box(x+.7,y+.7,.6,.6,41,11,'#f0c33c');fy(x+.8,x+1.2,y+1.302,43,49,'#fbe08a');
+  hip(x+.7,y+.7,.6,.6,52,13,.14,'#2b2b2e');
+  const tp=P(x+1,y+1,65);ell(tp[0],tp[1]-4,3.5,4.5,GOLD,'#8a6a1a');ell(tp[0]-4,tp[1]-8,3,1.5,GOLD,false);ell(tp[0]+4,tp[1]-8,3,1.5,GOLD,false);
+  for(let i=0;i<3;i++)twinkle(x+.8+i*.2,y+1.2-i*.2,30+i*12,n,i*.29);},
+ maneki(b,n){const x=b.x,y=b.y;shadowT(x+.5,y+.5,8);box(x+.3,y+.3,.4,.4,0,6,'#d6432b');box(x+.28,y+.28,.44,.44,6,1.5,GOLD);
+  const p=P(x+.5,y+.5,8);
+  ell(p[0],p[1]-8,8,9,'#fbf8f0','#1c2541');ell(p[0],p[1]-20,7.5,6.5,'#fbf8f0','#1c2541');
+  poly([[p[0]-7,p[1]-23],[p[0]-5,p[1]-29],[p[0]-2,p[1]-25]],'#fbf8f0','#1c2541');poly([[p[0]+7,p[1]-23],[p[0]+5,p[1]-29],[p[0]+2,p[1]-25]],'#fbf8f0','#1c2541');
+  ell(p[0]-5,p[1]-25,1,1.6,'#f2a3b6',false);ell(p[0]+5,p[1]-25,1,1.6,'#f2a3b6',false);
+  ln([p[0]-3.5,p[1]-21],[p[0]-1.5,p[1]-20],'#1c2541',1.1);ln([p[0]+1.5,p[1]-20],[p[0]+3.5,p[1]-21],'#1c2541',1.1);ell(p[0],p[1]-18.5,.9,.7,'#d6432b',false);
+  const wave=Math.sin(n/260)*1.5;ell(p[0]+8,p[1]-22+wave,2.8,3.6,'#fbf8f0','#1c2541');ln([p[0]+6,p[1]-12],[p[0]+8,p[1]-19+wave],'#1c2541',1);
+  ctx.beginPath();ctx.ellipse(p[0],p[1]-14,6.5,1.6,0,0,Math.PI);ctx.strokeStyle='#d6432b';ctx.lineWidth=2;ctx.stroke();ell(p[0],p[1]-12.4,1.8,1.8,GOLD,'#8a6a1a');
+  ell(p[0]-3,p[1]-7,3,3,'#f0b429','#8a6a1a');ell(p[0]-4,p[1]-4,2,1.4,'#e2b53a',false);},
+ golddaruma(b,n){const x=b.x,y=b.y;shadowT(x+.5,y+.5,8);box(x+.32,y+.32,.36,.36,0,4,'#2b2b2e');
+  const p=P(x+.5,y+.5,4);ell(p[0],p[1]-11,10,11.5,GOLD,'#8a6a1a');ell(p[0]-3,p[1]-16,3,4,'#fbe08a',false);ell(p[0],p[1]-14,6,5,'#fff8e1',false);
+  ell(p[0]-2.4,p[1]-14.5,1.5,1.5,'#1c2541',false);ell(p[0]+2.4,p[1]-14.5,1.5,1.5,'#1c2541',false);ln([p[0]-4,p[1]-6],[p[0]+4,p[1]-6],'#d6432b',1.6);
+  twinkle(x+.3,y+.4,30,n,.2);twinkle(x+.7,y+.6,22,n,.65);},
+ dragon(b,n){const x=b.x,y=b.y;shadowT(x+1,y+1,24);
+  const c=P(x+1,y+1,0);
+  box(x+.25,y+.25,1.5,1.5,0,6,'#a8a294');poly([P(x+.35,y+.35,6),P(x+1.65,y+.35,6),P(x+1.65,y+1.65,6),P(x+.35,y+1.65,6)],'#5aaec2','#3d8197');
+  for(let i=0;i<4;i++){const r=((n/1400)+i/4)%1,q=P(x+1,y+1,6);ell(q[0],q[1],8+r*34,4+r*17,'rgba(255,255,255,'+(.35*(1-r)).toFixed(2)+')',false);}
+  box(x+.88,y+.88,.24,.24,6,8,'#8e8a84');
+  const jade=['#2f7a5a','#3f8f6a','#4fa47a'];
+  const coil=[[0,14,8],[6,20,7.5],[2,27,7],[-5,33,6.5],[-1,40,6],[5,45,5.5]];
+  coil.forEach(([dx,dz,r],i)=>{ell(c[0]+dx,c[1]-dz,r,r*.85,jade[i%3],'rgba(28,37,65,.5)');ell(c[0]+dx-2,c[1]-dz-2,r*.4,r*.25,'rgba(255,255,255,.35)',false);});
+  const h=[c[0]+8,c[1]-50];ell(h[0],h[1],7,5,'#3f8f6a','rgba(28,37,65,.55)');poly([[h[0]+5,h[1]-1],[h[0]+12,h[1]+1],[h[0]+5,h[1]+3]],'#3f8f6a','rgba(28,37,65,.55)');
+  ln([h[0]-2,h[1]-4],[h[0]-6,h[1]-11],GOLD,1.4);ln([h[0]+1,h[1]-4],[h[0]+1,h[1]-12],GOLD,1.4);ell(h[0]+2,h[1]-1,1.2,1.2,'#f0b429',false);
+  for(let i=0;i<7;i++){const ph=((n/900)+i/7)%1,a=i/7*Math.PI*2,sx=h[0]+12+Math.cos(a)*ph*12,sy=h[1]+2-Math.sin(ph*Math.PI)*12+ph*20;ell(sx,sy,1.6,1.6,'rgba(220,245,255,'+(.9*(1-ph)).toFixed(2)+')',false);}},
+});
+
 function bat(px,py,s,f){const w=8*s,h=3*s*f;ctx.beginPath();ctx.moveTo(px,py);ctx.quadraticCurveTo(px-w*.5,py-h-2*s,px-w,py-h*.5);ctx.quadraticCurveTo(px-w*.6,py+s,px-w*.3,py+1.5*s);ctx.lineTo(px,py+2*s);ctx.lineTo(px+w*.3,py+1.5*s);ctx.quadraticCurveTo(px+w*.6,py+s,px+w,py-h*.5);ctx.quadraticCurveTo(px+w*.5,py-h-2*s,px,py);ctx.closePath();ctx.fillStyle='#231b2e';ctx.fill();}
 const ghosts=[];let ghostT=22;
 function updGhosts(dt,n){if(!eventOn()||visiting){ghosts.length=0;return;}ghostT+=dt;if(ghostT>=30&&ghosts.length<3){ghostT=0;const o=off(),sz=S.size;ghosts.push({x:o+1+Math.random()*(sz-2),y:o+1+Math.random()*(sz-2),ph:Math.random()*6,t0:n});}}
@@ -1293,9 +1393,9 @@ function place(t,tx,ty){
   if(blocked(d))return;
   const a=anchor(t,tx,ty);
   if(!canPlace(t,a.x,a.y)){toast(inMap(tx,ty)&&!unlocked(tx,ty)?'That land is still forest. Expand to use it.':'That spot is taken.');return;}
-  S.yen-=d.cost;if(d.candy)E().candy-=d.candy;
+  S.yen-=d.cost;if(d.candy)E().candy-=d.candy;if(d.koban)S.koban-=d.koban;
   const b={id:S.nid++,type:t,x:a.x,y:a.y};initB(b);S.b.push(b);S.c.built[t]=(S.c.built[t]||0)+1;
-  rebuild();float(b,d.candy?'-'+d.candy+' candy':(d.cost?'-¥'+num(d.cost):'Placed!'),d.candy?'#7a4fb0':'#d6432b');gainXp(Math.max(1,Math.round((d.cost+(d.candy||0)*5)/50)));save();
+  rebuild();float(b,d.koban?'-'+d.koban+' koban':d.candy?'-'+d.candy+' candy':(d.cost?'-¥'+num(d.cost):'Placed!'),d.koban?'#b8860b':d.candy?'#7a4fb0':'#d6432b');gainXp(Math.max(1,Math.round((d.cost+(d.candy||0)*5+(d.koban||0)*100)/50)));save();
   if(d.gold){setMode(null);toast('The Golden Pumpkin is yours!');}
   else if(d.staff&&!nearRoad(b))toast('Tip: shops only open when they touch a road.');
   else if(d.cat==='home'&&!nearRoad(b))toast('Tip: homes pay rent only when they touch a road.');
@@ -1308,19 +1408,19 @@ function paintAt(sx,sy){const w=s2w(sx,sy),t=w2t(w[0],w[1]),k=t[0]+','+t[1];if(k
 function interact(b){
   const d=DEFS[b.type],n=Date.now();
   if(d.cat==='farm'){
-    if(b.st==='empty'){if(S.energy<1){useE();return;}if(!spend(d.plant))return;useE();b.st='grow';b.t=n;float(b,'-¥'+d.plant,'#d6432b');save();return;}
+    if(b.st==='empty'){if(S.energy<1){useE();return;}if(!spend(d.plant))return;useE();S.c.plant=(S.c.plant||0)+1;b.st='grow';b.t=n;float(b,'-¥'+d.plant,'#d6432b');save();return;}
     if(prog(b,n)>=1){if(!useE())return;b.st='empty';const y=yieldOf(d);if(d.candyYield&&eventOn()){addCandy(y);float(b,'+'+y+' candy','#7a4fb0');}else{S.goods+=y;float(b,'+'+y+' goods','#4f7f2e');}S.c.harvest++;bumpCrop(d,b);gainXp(d.xp);save();return;}
     return showSheet(b);
   }
   if(d.cat==='shop'){
     if(!nearRoad(b)){toast(d.n+' needs to touch a road.');return;}
     if(b.st==='idle'){if(S.goods<d.supply){toast('Needs '+d.supply+' goods. You have '+S.goods+'. Harvest your farms.');return;}S.goods-=d.supply;b.st='open';b.t=n;S.c.supply++;float(b,'-'+d.supply+' goods','#8a6a2f');save();return;}
-    if(prog(b,n)>=1){if(!useE())return;const e=earnOf(b);S.yen+=e;b.st='idle';S.c.collect++;float(b,'+¥'+num(e),'#a87407');bump(b);if(d.id==='kitsune'&&eventOn()){addCandy(5);float(b,'+5 candy','#7a4fb0');}gainXp(d.xp);save();return;}
+    if(prog(b,n)>=1){if(!useE())return;const e=earnOf(b);S.yen+=e;S.c.earned=(S.c.earned||0)+e;b.st='idle';S.c.collect++;float(b,'+¥'+num(e),'#a87407');bump(b);if(d.id==='kitsune'&&eventOn()){addCandy(5);float(b,'+5 candy','#7a4fb0');}gainXp(d.xp);save();return;}
     return showSheet(b);
   }
   if(d.cat==='home'){
     if(!nearRoad(b)){toast(d.n+' needs to touch a road to pay rent.');return;}
-    if(prog(b,n)>=1){if(!useE())return;const r=rentOf(b);S.yen+=r;b.t=n;S.c.rent++;float(b,'+¥'+num(r),'#a87407');bump(b);gainXp(d.xp);save();return;}
+    if(prog(b,n)>=1){if(!useE())return;const r=rentOf(b);S.yen+=r;S.c.earned=(S.c.earned||0)+r;b.t=n;S.c.rent++;float(b,'+¥'+num(r),'#a87407');bump(b);gainXp(d.xp);save();return;}
     return showSheet(b);
   }
   showSheet(b);
@@ -1329,11 +1429,20 @@ function refund(b){return Math.floor(DEFS[b.type].cost*.3);}
 function starTip(){if(S.tips&&S.tips.star)return;S.tips=S.tips||{};S.tips.star=true;
   modal('<div class="big">'+TANUKI+'</div><h2>Your first mastery star!</h2><p>Buildings earn stars as you collect from them: ★ after 10, ★★ after 25 and ★★★ after 50. Each star adds +10% income.</p><p><b>Stars unlock upgrades.</b> Tap a starred building when it is not ready to see the Upgrade button. Farms earn mastery for their whole crop type.</p>',[{label:'Got it',cls:'primary'}]);}
 function bump(b){const before=bStars(b);b.cnt=(b.cnt||0)+1;const after=bStars(b);if(after<=before)return;
-  const d=DEFS[b.type];S.c.stars=Math.max(S.c.stars||0,after);floatAt(b.x+d.w/2,b.y+d.h/2,htOf(b)+30,starTxt(after).replace(/☆/g,''),'#c9971f');
+  const d=DEFS[b.type];S.c.stars=Math.max(S.c.stars||0,after);if(after===3)S.c.s3=(S.c.s3||0)+1;floatAt(b.x+d.w/2,b.y+d.h/2,htOf(b)+30,starTxt(after).replace(/☆/g,''),'#c9971f');
   toast(d.n+' earned '+'★'.repeat(after)+'! +10% income'+(after===lvOf(b)&&after<3?' · Upgrade unlocked':''));starTip();}
 function bumpCrop(d,b){S.mast=S.mast||{};const before=fStars(d.id);S.mast[d.id]=(S.mast[d.id]||0)+1;const after=fStars(d.id);if(after<=before)return;
   S.c.fstars=Math.max(S.c.fstars||0,after);floatAt(b.x+.5,b.y+.5,d.ht+30,'★'.repeat(after),'#c9971f');
   toast(d.n+' mastery '+'★'.repeat(after)+'! Every '+d.n+' now gives '+Math.round((YIELD_MULT[after]-1)*100)+'% more.');starTip();}
+function goodsValue(){let s=0,c=0;for(const b of S.b){const d=DEFS[b.type];if(d.cat==='shop'&&d.supply){s+=earnOf(b)/d.supply;c++;}}return c?s/c:6;}
+/* Finish now costs 1.5x what the timer will produce, scaled by time left, so it saves time but is never a profit */
+function finishCost(b){const d=DEFS[b.type],p=prog(b,Date.now());if(p>=1||visiting)return 0;const rem=1-p;let v;
+  if(d.cat==='farm'){if(b.st==='empty')return 0;v=yieldOf(d)*(d.candyYield&&eventOn()?8:goodsValue());}
+  else if(d.cat==='shop'){if(b.st!=='open')return 0;v=earnOf(b);}
+  else if(d.cat==='home')v=rentOf(b);else return 0;
+  return Math.max(10,Math.round(rem*v*1.5/5)*5);}
+function finishNow(b){const c=finishCost(b),d=DEFS[b.type];if(!c)return;if(S.yen<c){toast('You need ¥'+num(c-S.yen)+' more.');return;}
+  S.yen-=c;const span=(d.cat==='farm'?d.grow:d.time)*1000;b.t=Date.now()-span-1;S.c.fin=(S.c.fin||0)+1;float(b,'-¥'+num(c),'#d6432b');save();toast(d.n+' is ready!');updSheet();}
 function doUpgrade(b){const c=upCost(b),d=DEFS[b.type];if(!c||visiting)return;
   if(bStars(b)<c.need){toast('Earn '+'★'.repeat(c.need)+' first by collecting from it.');return;}
   if(S.yen<c.yen){toast('You need ¥'+num(c.yen-S.yen)+' more.');return;}
@@ -1451,7 +1560,7 @@ function renderTabs(){const el=$('#tabs');el.innerHTML='';if(tab==='event'&&!eve
   for(const [k,l] of CATS){if(k==='event'&&!eventOn())continue;const b=document.createElement('button');b.className='tab'+(k===tab?' on':'')+(k==='event'?' evtab':'');b.textContent=l;b.onclick=()=>{tab=k;renderTabs();renderCards();};el.appendChild(b);}
   const x=document.createElement('button');x.id='drawerClose';x.textContent='×';x.setAttribute('aria-label','Close build menu');x.onclick=closeDrawer;el.appendChild(x);}
 function meta(d){if(d.cat==='farm')return d.yield+(d.candyYield&&eventOn()?' candy':' goods')+' · '+fmt(d.grow);if(d.cat==='shop')return '¥'+num(d.earn)+' · '+fmt(d.time)+' · '+d.staff+' staff';if(d.cat==='home')return d.res+' residents · ¥'+d.rent+' rent';if(d.cat==='decor')return '+'+(d.appeal*3)+' tourists';return 'Drag to pave';}
-function costTxt(d){if(d.candy)return num(d.candy)+' candy'+(d.cost?' + ¥'+num(d.cost):'');if(d.gold)return 'Free reward';return '¥'+num(d.cost);}
+function costTxt(d){if(d.koban)return d.koban+' koban';if(d.candy)return num(d.candy)+' candy'+(d.cost?' + ¥'+num(d.cost):'');if(d.gold)return 'Free reward';return '¥'+num(d.cost);}
 function blocked(d,quiet){const say=m=>{if(!quiet)toast(m);return true;};
   if(S.lvl<d.lvl)return say(d.n+' unlocks at level '+d.lvl+'.');
   if(d.ev&&!eventOn())return say('This limited item is no longer available.');
@@ -1459,15 +1568,17 @@ function blocked(d,quiet){const say=m=>{if(!quiet)toast(m);return true;};
   if(d.staff&&D.res-D.staff<d.staff)return say('Not enough staff. Build homes for '+(d.staff-(D.res-D.staff))+' more residents.');
   if(S.yen<d.cost)return say('You need ¥'+num(d.cost-S.yen)+' more.');
   if(d.candy&&E().candy<d.candy)return say('You need '+(d.candy-E().candy)+' more candy.');
+  if(d.koban&&S.koban<d.koban)return say('You need '+(d.koban-S.koban)+' more koban. Earn them from daily missions and achievements.');
   return false;}
 function renderCards(){const el=$('#cards');el.innerHTML='';
   for(const k in DEFS){const d=DEFS[k];if((d.tab||d.cat)!==tab)continue;if(d.gold&&(!E().gold||ev('goldpump')>=1))continue;
     const b=document.createElement('button');b.className='card';b.dataset.t=k;
-    const locked=S.lvl<d.lvl;if(locked)b.classList.add('locked');else if(S.yen<d.cost||(d.candy&&E().candy<d.candy))b.classList.add('poor');
+    const locked=S.lvl<d.lvl;if(locked)b.classList.add('locked');else if(S.yen<d.cost||(d.candy&&E().candy<d.candy)||(d.koban&&S.koban<d.koban))b.classList.add('poor');
     const c=document.createElement('canvas');c.width=224;c.height=160;b.appendChild(c);
     b.insertAdjacentHTML('beforeend','<span class="cname">'+d.n+(d.w>1?' <small style="color:#4b5675;font-weight:700">'+d.w+'×'+d.h+'</small>':'')+'</span><span class="cmeta">'+meta(d)+'</span><span class="ccost">'+costTxt(d)+'</span>'+(locked?'<span class="lock">Lv '+d.lvl+'</span>':'')+(d.ev?'<span class="lim">Limited</span>':''));
     b.onclick=()=>{if(blocked(d))return;$('#drawer').hidden=true;mode='build';sel=k;moving=null;removeSel=null;updChip();};
     el.appendChild(b);thumb(c,k);}
+  if(tab==='treasure')el.insertAdjacentHTML('afterbegin','<div class="evnote koban"><b>'+S.koban+'</b> koban<br><small>Earn koban from daily missions and achievements.</small></div>');
   if(tab==='event')el.insertAdjacentHTML('afterbegin','<div class="evnote"><b>'+num(E().candy)+'</b> candy<br><small>Limited items. Gone after 11 Nov!</small></div>');
 }
 function thumb(cnv,t,bState){
@@ -1493,10 +1604,12 @@ function updSheet(){if(!sheetB)return;const b=sheetB,d=DEFS[b.type],n=Date.now()
   if(d.cat==='shop'||d.cat==='home'){const k=bStars(b),c=b.cnt||0;sh=starTxt(k)+' <small>'+(k>=3?'Max stars · +30% income':c+' / '+STAR_B[k]+' collections to next star'+(k?' · +'+k*10+'% income':''))+'</small>';}
   else if(d.cat==='farm'){const k=fStars(d.id),c=(S.mast&&S.mast[d.id])||0;sh=starTxt(k)+' <small>'+d.n+' mastery · '+(k>=3?'max':c+' / '+STAR_F[k]+' harvests')+(k?' · +'+Math.round((YIELD_MULT[k]-1)*100)+'% yield':'')+'</small>';}
   se.innerHTML=sh;se.hidden=!sh;
+  const fc=finishCost(b),fb=$('#sFin');fb.hidden=!fc;if(fc)fb.textContent='Finish now · ¥'+num(fc);
   const c=visiting?null:upCost(b);up.hidden=!c;
   if(c){const ok=bStars(b)>=c.need;up.classList.toggle('locked',!ok);up.textContent=ok?'Upgrade to Lv '+c.to+' · ¥'+num(c.yen)+' + '+num(c.goods)+' goods':'Upgrade to Lv '+c.to+' needs '+'★'.repeat(c.need);}$('#sMove').hidden=$('#sSell').hidden=!!visiting;$('#sBarW').hidden=barv===null;if(barv!==null)$('#sBar').style.width=(clamp(barv,0,1)*100)+'%';}
 $('#sMove').onclick=()=>{const b=sheetB;setMode('move');moving=b;updChip();};
 $('#sUp').onclick=()=>{if(sheetB)doUpgrade(sheetB);};
+$('#sFin').onclick=()=>{if(sheetB)finishNow(sheetB);};
 $('#sSell').onclick=()=>{const el=$('#sSell'),b=sheetB;if(!b)return;if(el.dataset.armed){removeB(b);return;}if(!canRemove(b))return;el.dataset.armed='1';el.textContent=DEFS[b.type].ev?'Limited! Sure?':'Sure? +¥'+num(refund(b));};
 document.querySelectorAll('#dock button').forEach(btn=>btn.onclick=()=>{const a=btn.dataset.act;
   if(a==='build'){if($('#drawer').hidden)openDrawer();else closeDrawer();return;}
@@ -1527,8 +1640,8 @@ function openMenu(){modal('<div class="big">'+TANUKI+'</div><h2>How to play</h2>
   '<li><b>Decor</b> brings tourists. More tourists means shops earn more.</li>'+
   '<li>Harvesting and collecting cost 1 onigiri of energy. It refills every '+ER+' seconds.</li>'+
   '<li>Drag to look around, pinch or scroll to zoom.</li>'+
-  '<li>'+(window.cloud?'Tap the cloud button to sign in and save online. The trophy shows the leaderboard, and the people button opens your friends list.':'Your town saves in this browser.')+'</li>'+'<li>Visit friends and tap Help once a day. You both get a reward.</li></ul>',
-  [{label:'Start a new town',cls:'danger',fn:el=>{if(el.dataset.armed){S=newState();S.savedAt=Date.now();rebuild();walkers.length=0;floats.length=0;setMode(null);hideSheet();closeDrawer();dirty=true;flush();cloudDirty=true;pushCloud(true);fitCam();toast('A fresh valley awaits.');return;}el.dataset.armed='1';el.textContent='Tap again to erase this town';return true;}},{label:'Back to town',cls:'primary'}]);}
+  '<li>'+(window.cloud?'Tap the cloud button to sign in and save online. The trophy shows the leaderboard, and the people button opens your friends list.':'Your town saves in this browser.')+'</li>'+'<li>Visit friends and tap Help once a day. You both get a reward.</li>'+'<li>Tap <b>Goals</b> for daily missions and achievements. They pay <b>koban</b>, which buy exclusive treasures and permanent boosts.</li>'+'<li>Busy buildings can be finished instantly for yen, and the energy shop sells 5 energy up to 3 times a day.</li></ul>',
+  [{label:'Start a new town',cls:'danger',fn:el=>{if(el.dataset.armed){S=normalize(newState());S.savedAt=Date.now();rebuild();walkers.length=0;floats.length=0;setMode(null);hideSheet();closeDrawer();dirty=true;flush();cloudDirty=true;pushCloud(true);fitCam();toast('A fresh valley awaits.');return;}el.dataset.armed='1';el.textContent='Tap again to erase this town';return true;}},{label:'Back to town',cls:'primary'}]);}
 $('#menuBtn').onclick=openMenu;
 
 /* ---------- quests ---------- */
@@ -1603,19 +1716,23 @@ const VIDEO_ICON='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="t
 let adBusy=false,adsOff='',gpOn=false;
 function gp(on){if(!CG||gpOn===on)return;gpOn=on;try{on?CG.game.gameplayStart():CG.game.gameplayStop();}catch(e){}}
 function adState(){if(!S.ads||S.ads.d!==today())S.ads={d:today(),n:0,last:0};return S.ads;}
-const energyPrice=()=>30+S.lvl*15;
+const EBUY_MAX=3,EBUY_STEP=[4,6,9];
+function avgCollect(){let s=0,c=0;for(const b of S.b){const d=DEFS[b.type];if(d.cat==='shop'&&nearRoad(b)){s+=earnOf(b);c++;}}return c?s/c:50*S.lvl;}
+function ebuyState(){if(!S.ebuy||S.ebuy.d!==today())S.ebuy={d:today(),n:0};return S.ebuy;}
+function energyPrice(){const k=Math.min(ebuyState().n,EBUY_MAX-1);return Math.max(100*S.lvl,Math.round(avgCollect()*EBUY_STEP[k]/10)*10);}
 function openEnergy(){
   if(visiting)return;
   const me=maxE(),a=adState(),wait=Math.max(0,AD_GAP-(Date.now()-a.last)),canAd=CG&&!adsOff&&a.n<AD_MAX&&wait<=0;
   let note='';
   if(CG){if(adsOff)note=adsOff;else if(a.n>=AD_MAX)note='You watched all '+AD_MAX+' ads for today. Come back tomorrow!';else if(wait>0)note='Next video in '+fmt(wait/1000)+'.';}
-  const btns=[{label:'No thanks'},{label:'Buy '+AD_GAIN+' for ¥'+num(energyPrice()),fn:buyEnergy}];
+  const eb=ebuyState(),left=EBUY_MAX-eb.n;if(left<=0)note=(note?note+' ':'')+'You bought energy '+EBUY_MAX+' times today. The shop opens again tomorrow.';
+  const btns=[{label:'No thanks'}];if(left>0)btns.push({label:'Buy '+AD_GAIN+' for ¥'+num(energyPrice()),fn:buyEnergy});
   if(canAd)btns.push({html:VIDEO_ICON+'Watch video: +'+AD_GAIN,fn:watchAd});
   modal('<div class="big">'+ONIGIRI+'</div><h2>Need more energy?</h2><p>You have <b>'+S.energy+' / '+me+'</b> energy. You get 1 back every '+ER+' seconds.</p>'+
-    (CG?'<p>Watch a short video for <b>+'+AD_GAIN+' energy</b> ('+Math.max(0,AD_MAX-a.n)+' left today), or buy energy with yen.</p>':'<p>Buy <b>+'+AD_GAIN+' energy</b> with yen.</p>')+
+    (CG?'<p>Watch a short video for <b>+'+AD_GAIN+' energy</b> ('+Math.max(0,AD_MAX-a.n)+' left today), or buy energy with yen.</p>':'<p>Buy <b>+'+AD_GAIN+' energy</b> with yen.</p>')+'<p style="font-size:12px">Energy shop: '+Math.max(0,left)+' of '+EBUY_MAX+' left today. Each buy costs more than the last.</p>'+
     (note?'<p class="adnote">'+note+'</p>':''),btns);}
 function rewardFx(txt){toast(txt);const b=$('#enBtn');b.classList.remove('pulse');void b.offsetWidth;b.classList.add('pulse');}
-function buyEnergy(){const pr=energyPrice();if(S.yen<pr){toast('You need ¥'+num(pr-S.yen)+' more.');return;}S.yen-=pr;S.energy+=AD_GAIN;save();updHUD();rewardFx('+'+AD_GAIN+' energy!');}
+function buyEnergy(){const eb=ebuyState();if(eb.n>=EBUY_MAX){toast('The energy shop is closed until tomorrow.');return;}const pr=energyPrice();if(S.yen<pr){toast('You need ¥'+num(pr-S.yen)+' more.');return;}S.yen-=pr;eb.n++;S.energy+=AD_GAIN;save();updHUD();rewardFx('+'+AD_GAIN+' energy!');}
 function watchAd(){
   if(!CG||adBusy)return;const a=adState();if(a.n>=AD_MAX)return;
   adBusy=true;$('#adCover').hidden=false;gp(false);
@@ -1628,7 +1745,101 @@ function watchAd(){
   try{CG.ad.requestAd('rewarded',{adStarted:()=>{},adFinished:()=>done(true),adError:e=>done(false,e)});}catch(e){done(false,{code:'other'});}}
 $('#enBtn').onclick=openEnergy;
 
-setInterval(()=>{tickEnergy(Date.now());recompute();updHUD();updQuest();updSheet();updEvent();if(!$('#drawer').hidden){document.querySelectorAll('.card').forEach(c=>{const d=DEFS[c.dataset.t];c.classList.toggle('poor',S.lvl>=d.lvl&&(S.yen<d.cost||!!(d.candy&&E().candy<d.candy)));});}},250);
+/* ---------- Goals: daily missions, lifetime achievements and the Treasure shop (all pay out koban) ---------- */
+const ACH=[
+ {id:'harvest',n:'Green Thumb',d:'Harvest crops',v:()=>S.c.harvest||0,t:[50,250,1000],title:'Rice Master'},
+ {id:'collect',n:'Shopkeeper',d:'Collect from shops',v:()=>S.c.collect||0,t:[50,250,1000],title:'Shop Tycoon'},
+ {id:'rent',n:'Landlord',d:'Collect rent',v:()=>S.c.rent||0,t:[50,250,1000],title:'Landlord'},
+ {id:'tour',n:'Tourist Magnet',d:'Welcome tourists at once',v:()=>S.c.maxTour||0,t:[500,1500,3000],title:'Tourist Magnet'},
+ {id:'build',n:'Master Builder',d:'Build buildings',v:()=>builtTotal(),t:[25,75,150],title:'Master Builder'},
+ {id:'earn',n:'Millionaire',d:'Earn yen from shops and rent',v:()=>S.c.earned||0,t:[50000,500000,5000000],title:'Millionaire'},
+ {id:'upg',n:'Craftsman',d:'Upgrade buildings',v:()=>S.c.upg||0,t:[1,10,25],title:'Craftsman'},
+ {id:'stars',n:'Star Mayor',d:'Buildings reaching ★★★',v:()=>S.c.s3||0,t:[1,5,15],title:'Star Mayor'},
+ {id:'mast',n:'Harvest Sage',d:'Crop types at ★★★ mastery',v:()=>Object.keys(S.mast||{}).filter(k=>DEFS[k]&&fStars(k)>=3).length,t:[1,2,3],title:'Harvest Sage'},
+ {id:'daily',n:'Diligent Mayor',d:'Complete daily missions',v:()=>S.c.daily||0,t:[5,25,100],title:'Diligent Mayor'},
+ {id:'help',n:'Good Neighbour',d:'Help friends',v:()=>S.c.help||0,t:[1,10,50],title:'Good Neighbour'},
+ {id:'land',n:'Land Baron',d:'Expand your land',v:()=>S.c.expand||0,t:[1,2,4],title:'Land Baron'},
+ {id:'level',n:'Veteran Mayor',d:'Reach level',v:()=>S.lvl,t:[5,10,15],title:'Veteran Mayor'},
+ {id:'lm',n:'Monument Maker',d:'Build landmarks',v:()=>Object.keys(DEFS).filter(k=>DEFS[k].lm).reduce((a,k)=>a+ev(k),0),t:[1,2,4],title:'Monument Maker'},
+];
+const ACH_KOBAN=[2,5,10];
+const achTier=a=>S.ach[a.id]|0;
+const achReady=a=>{const k=achTier(a);return k<3&&a.v()>=a.t[k];};
+
+/* daily missions: 3 a day, picked from this pool by date, with targets that grow with your level */
+const DPOOL=[
+ {id:'harvest',k:'harvest',n:t=>'Harvest '+t+' crops',t:l=>6+l},
+ {id:'collect',k:'collect',n:t=>'Collect from shops '+t+' times',t:l=>4+Math.ceil(l/2)},
+ {id:'rent',k:'rent',n:t=>'Collect rent '+t+' times',t:l=>3+Math.ceil(l/3)},
+ {id:'supply',k:'supply',n:t=>'Stock shops with goods '+t+' times',t:l=>3+Math.ceil(l/3)},
+ {id:'plant',k:'plant',n:t=>'Plant '+t+' crops',t:l=>6+l},
+ {id:'build',k:'builtT',n:t=>'Build '+t+' new buildings',t:()=>3},
+ {id:'earn',k:'earned',n:t=>'Earn ¥'+num(t)+' from shops and rent',t:()=>Math.max(300,Math.round(avgCollect()*12/100)*100)},
+ {id:'help',k:'help',n:()=>'Help a friend in their town',t:()=>1,ok:()=>!!cloudUser},
+ {id:'upg',k:'upg',n:()=>'Upgrade a building',t:()=>1,ok:()=>S.lvl>=4&&S.b.some(b=>bStars(b)>=lvOf(b)&&upCost(b))},
+];
+const cval=k=>k==='builtT'?builtTotal():(S.c[k]||0);
+function dayKey(off){const d=new Date();d.setDate(d.getDate()+(off||0));return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function newDaily(){
+  const key=today();let seed=0;for(const ch of key)seed=(seed*31+ch.charCodeAt(0))%1000003;
+  const pool=DPOOL.filter(m=>!m.ok||m.ok());const ids=[];
+  while(ids.length<3&&ids.length<pool.length){seed=(seed*9301+49297)%233280;const m=pool[Math.floor(seed/233280*pool.length)];if(!ids.includes(m.id))ids.push(m.id);}
+  const ms=ids.map(id=>DPOOL.find(m=>m.id===id));
+  S.daily={d:key,ids,t:ms.map(m=>m.t(S.lvl)),base:ms.map(m=>cval(m.k)),claimed:[false,false,false],bonus:false};}
+function dailyNow(){if(!S.daily||S.daily.d!==today())newDaily();return S.daily;}
+function dProg(i){const dl=dailyNow(),m=DPOOL.find(q=>q.id===dl.ids[i]);return Math.max(0,cval(m.k)-dl.base[i]);}
+function goalsReady(){if(visiting)return 0;const dl=dailyNow();let c=0;
+  dl.ids.forEach((id,i)=>{if(!dl.claimed[i]&&dProg(i)>=dl.t[i])c++;});if(!dl.bonus&&dl.claimed.every(Boolean))c++;
+  return c+ACH.filter(achReady).length;}
+function giveKoban(k,why){S.koban+=k;toast('+'+k+' koban · '+why);}
+function claimDaily(i){const dl=dailyNow();if(dl.claimed[i]||dProg(i)<dl.t[i])return;dl.claimed[i]=true;S.c.daily=(S.c.daily||0)+1;S.energy+=5;giveKoban(1,'mission complete, +5 energy');save();}
+function claimBonus(){const dl=dailyNow();if(dl.bonus||!dl.claimed.every(Boolean))return;dl.bonus=true;
+  const st=S.streak||{n:0,last:''};st.n=st.last===dayKey(-1)?st.n+1:1;st.last=today();S.streak=st;
+  let k=3,why='all daily missions done';if(st.n%7===0){k+=10;why='7-day streak!';}giveKoban(k,why);save();}
+function claimAch(a){const k=achTier(a);if(k>=3||a.v()<a.t[k])return;S.ach[a.id]=k+1;let why=a.n+' '+'★'.repeat(k+1);
+  if(k+1===3&&!S.titles.includes(a.title)){S.titles.push(a.title);if(!S.title)S.title=a.title;why+=' · new title: '+a.title;}
+  giveKoban(ACH_KOBAN[k],why);save();}
+/* treasure shop perks */
+const PERKS=[
+ {id:'inc',n:'Lucky Charm',d:'+5% income from every shop and home',cost:12,max:5},
+ {id:'en',n:'Bigger Lunchbox',d:'+2 maximum energy',cost:8,max:5},
+];
+function buyPerk(p){const lv=S.perk[p.id]|0;if(lv>=p.max)return;if(S.koban<p.cost){toast('You need '+(p.cost-S.koban)+' more koban.');return;}S.koban-=p.cost;S.perk[p.id]=lv+1;recompute();save();toast(p.n+' level '+(lv+1)+'!');}
+function buyRefill(){if(S.koban<3){toast('You need '+(3-S.koban)+' more koban.');return;}if(S.energy>=maxE()){toast('Your energy is already full.');return;}S.koban-=3;S.energy=maxE();save();rewardFx('Energy refilled!');}
+
+let goalsTab='daily';
+function openGoals(tabName){if(visiting)return;if(tabName)goalsTab=tabName;
+  modal('<h2>Mayor\'s Goals</h2><div class="kbal">'+KOBAN+'<b id="gKoban">'+S.koban+'</b> koban</div><div class="btabs" id="gTabs"><button class="tab" data-g="daily">Daily</button><button class="tab" data-g="ach">Achievements</button><button class="tab" data-g="shop">Treasure</button></div><div id="gBody"></div>',
+    [{label:'Close',cls:'primary'}],card=>{card.querySelectorAll('#gTabs .tab').forEach(t=>t.onclick=()=>{goalsTab=t.dataset.g;renderGoals(card);});renderGoals(card);});}
+function renderGoals(card){const body=card.querySelector('#gBody');if(!body)return;
+  card.querySelectorAll('#gTabs .tab').forEach(t=>t.classList.toggle('on',t.dataset.g===goalsTab));card.querySelector('#gKoban').textContent=S.koban;
+  const bar=(v,t)=>'<span class="gbar"><i style="width:'+Math.min(100,v/t*100)+'%"></i></span>';
+  let h='';
+  if(goalsTab==='daily'){const dl=dailyNow(),st=S.streak||{n:0,last:''},left=(new Date(new Date().setHours(24,0,0,0))-new Date())/1000;
+    h='<ol class="board goals">'+dl.ids.map((id,i)=>{const m=DPOOL.find(q=>q.id===id),v=Math.min(dProg(i),dl.t[i]),done=v>=dl.t[i];
+      return '<li><span class="rk">'+(i+1)+'</span><span class="who"><span class="nm">'+m.n(dl.t[i])+'</span><span class="tw">'+bar(v,dl.t[i])+num(v)+' / '+num(dl.t[i])+' · 1 koban + 5 energy</span></span><span class="val">'+(dl.claimed[i]?'Done':done?'<button class="btn mini primary" data-d="'+i+'">Claim</button>':'')+'</span></li>';}).join('')+
+      '<li class="bonus"><span class="rk">★</span><span class="who"><span class="nm">Finish all 3 missions</span><span class="tw">3 koban · 7-day streak gives +10 more</span></span><span class="val">'+(dl.bonus?'Done':dl.claimed.every(Boolean)?'<button class="btn mini primary" id="gBonus">Claim</button>':'')+'</span></li></ol>'+
+      '<p class="gnote">Streak: <b>'+(st.last===today()||st.last===dayKey(-1)?st.n:0)+' days</b> · New missions in '+fmt(left)+'</p>';}
+  else if(goalsTab==='ach'){
+    h=(S.titles.length?'<p class="gnote">Your title: '+S.titles.map(t=>'<button class="tab tsel'+(t===S.title?' on':'')+'" data-t="'+esc(t)+'">'+esc(t)+'</button>').join(' ')+'</p>':'<p class="gnote">Complete an achievement to ★★★ to earn a title for the leaderboard.</p>')+
+      '<ol class="board goals">'+ACH.map((a,i)=>{const k=achTier(a),v=a.v(),t=a.t[Math.min(k,2)];
+      return '<li><span class="rk astars">'+'★'.repeat(k)+'<em>'+'☆'.repeat(3-k)+'</em></span><span class="who"><span class="nm">'+a.n+'</span><span class="tw">'+(k>=3?'Complete · title: '+a.title:bar(v,t)+a.d+' '+num(Math.min(v,t))+' / '+num(t)+' · '+ACH_KOBAN[k]+' koban')+'</span></span><span class="val">'+(achReady(a)?'<button class="btn mini primary" data-a="'+i+'">Claim</button>':'')+'</span></li>';}).join('')+'</ol>';}
+  else{
+    h='<ol class="board goals">'+PERKS.map((p,i)=>{const lv=S.perk[p.id]|0;return '<li><span class="rk">'+lv+'/'+p.max+'</span><span class="who"><span class="nm">'+p.n+'</span><span class="tw">'+p.d+(lv?' · now +'+(p.id==='inc'?lv*5+'%':lv*2+' energy'):'')+'</span></span><span class="val">'+(lv>=p.max?'Max':'<button class="btn mini" data-p="'+i+'">'+p.cost+' koban</button>')+'</span></li>';}).join('')+
+      '<li><span class="rk">⚡</span><span class="who"><span class="nm">Full energy refill</span><span class="tw">Fill your energy to the top right now</span></span><span class="val"><button class="btn mini" id="gRefill">3 koban</button></span></li>'+
+      Object.keys(DEFS).filter(k=>DEFS[k].tab==='treasure').map(k=>{const d=DEFS[k];return '<li><span class="rk">'+(ev(k)?'✓':'')+'</span><span class="who"><span class="nm">'+d.n+(d.w>1?' (2×2)':'')+'</span><span class="tw">Exclusive decoration · +'+d.appeal*3+' tourists</span></span><span class="val"><button class="btn mini" data-b="'+k+'">'+d.koban+' koban</button></span></li>';}).join('')+'</ol>';}
+  body.innerHTML=h;
+  body.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{claimDaily(+b.dataset.d);renderGoals(card);});
+  const gb=body.querySelector('#gBonus');if(gb)gb.onclick=()=>{claimBonus();renderGoals(card);};
+  body.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{claimAch(ACH[+b.dataset.a]);renderGoals(card);});
+  body.querySelectorAll('.tsel').forEach(b=>b.onclick=()=>{S.title=b.dataset.t;save();pushBoard();renderGoals(card);});
+  body.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{buyPerk(PERKS[+b.dataset.p]);renderGoals(card);});
+  const rf=body.querySelector('#gRefill');if(rf)rf.onclick=()=>{buyRefill();renderGoals(card);};
+  body.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const d=DEFS[b.dataset.b];if(blocked(d))return;nextModal();closeDrawer();mode='build';sel=b.dataset.b;moving=null;removeSel=null;updChip();});}
+function updGoalsBtn(){const n=goalsReady(),dot=$('#goalsDot');dot.hidden=!n;dot.textContent=n>9?'9+':n;}
+$('#goalsBtn').onclick=()=>openGoals();
+
+setInterval(()=>{tickEnergy(Date.now());recompute();updHUD();if(!visiting){S.c.maxTour=Math.max(S.c.maxTour||0,D.tourists);updGoalsBtn();}updQuest();updSheet();updEvent();if(!$('#drawer').hidden){document.querySelectorAll('.card').forEach(c=>{const d=DEFS[c.dataset.t];c.classList.toggle('poor',S.lvl>=d.lvl&&(S.yen<d.cost||!!(d.candy&&E().candy<d.candy)||!!(d.koban&&S.koban<d.koban)));});}},250);
 
 /* ---------- boot ---------- */
 resize();rebuild();fitCam();tickEnergy(Date.now());updHUD();updQuest();updEvent();
