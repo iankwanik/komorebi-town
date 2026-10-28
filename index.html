@@ -1117,13 +1117,41 @@ function interact(b){
 function refund(b){return Math.floor(DEFS[b.type].cost*.3);}
 function canRemove(b){const d=DEFS[b.type];if(d.res&&D.res-d.res<D.staff){toast('Your shops need these residents as staff.');return false;}return true;}
 function removeB(b){if(!canRemove(b))return;const r=refund(b);S.yen+=r;S.b=S.b.filter(x=>x!==b);if(sheetB===b)hideSheet();removeSel=null;rebuild();save();toast(DEFS[b.type].n+' removed. +¥'+num(r));}
-function pick(w){
-  const list=S.b.slice().sort((a,b)=>(b.x+b.y+(DEFS[b.type].w+DEFS[b.type].h)/2)-(a.x+a.y+(DEFS[a.type].w+DEFS[a.type].h)/2));
-  for(const b of list){const d=DEFS[b.type],ht=Math.max(14,d.ht),t=P(b.x,b.y),r=P(b.x+d.w,b.y),bo=P(b.x+d.w,b.y+d.h),l=P(b.x,b.y+d.h);
-    const pg=[l,[l[0],l[1]-ht],[t[0],t[1]-ht],[r[0],r[1]-ht],r,bo];
-    let inside=false;for(let i=0,j=pg.length-1;i<pg.length;j=i++){const a=pg[i],c=pg[j];if(((a[1]>w[1])!==(c[1]>w[1]))&&(w[0]<(c[0]-a[0])*(w[1]-a[1])/(c[1]-a[1])+a[0]))inside=!inside;}
-    if(inside)return b;}
-  return null;}
+/* ---------- tap picking: bubbles first, then pixel-accurate hits, then smart priority ---------- */
+let lastPT='mouse';
+const HS=19,hitC=document.createElement('canvas');hitC.width=hitC.height=HS;const hitX=hitC.getContext('2d',{willReadFrequently:true});
+const depthOf=b=>{const d=DEFS[b.type];return b.x+b.y+(d.w+d.h)/2;};
+function w2tF(w){const a=w[1]/16,c=w[0]/32;return[(a+c)/2,(a-c)/2];}
+function inFoot(b,w){const d=DEFS[b.type],t=w2tF(w);return t[0]>=b.x&&t[0]<b.x+d.w&&t[1]>=b.y&&t[1]<b.y+d.h;}
+function inBox(b,w,pad){const d=DEFS[b.type],t=P(b.x,b.y),r=P(b.x+d.w,b.y),bo=P(b.x+d.w,b.y+d.h),l=P(b.x,b.y+d.h);
+  return w[0]>=l[0]-pad&&w[0]<=r[0]+pad&&w[1]>=t[1]-Math.max(14,d.ht)-24-pad&&w[1]<=bo[1]+pad;}
+function opaqueAt(b,w){
+  const tol=lastPT==='mouse'?3:9,k=cam.z,c=hitX,prev=ctx,n=Date.now();
+  c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,HS,HS);c.setTransform(k,0,0,k,HS/2-w[0]*k,HS/2-w[1]*k);
+  ctx=c;try{DR[b.type](b,n,prog(b,n));}catch(e){}ctx=prev;
+  const px=c.getImageData(0,0,HS,HS).data,h=HS/2;
+  for(let y=0;y<HS;y++)for(let x=0;x<HS;x++){const dx=x+.5-h,dy=y+.5-h;if(dx*dx+dy*dy<=tol*tol&&px[(y*HS+x)*4+3]>70)return true;}
+  return false;}
+function hits(w){const out=[],pad=12/cam.z;
+  for(const b of S.b.slice().sort((a,c)=>depthOf(c)-depthOf(a))){const foot=inFoot(b,w),op=inBox(b,w,pad)&&opaqueAt(b,w);if(foot||op)out.push({b,foot,op});}
+  return out;}
+function actionable(b){const d=DEFS[b.type],n=Date.now();
+  if(d.cat==='farm')return b.st==='empty'?(S.yen>=d.plant&&S.energy>=1):(prog(b,n)>=1&&S.energy>=1);
+  if(d.cat==='shop')return nearRoad(b)&&(b.st==='idle'?S.goods>=d.supply:(prog(b,n)>=1&&S.energy>=1));
+  if(d.cat==='home')return nearRoad(b)&&prog(b,n)>=1&&S.energy>=1;
+  return false;}
+function bubbleHit(w){
+  if(mode||visiting)return null;
+  const s=clamp(1/cam.z,.85,1.7),r=(lastPT==='mouse'?13:18)*s,n=Date.now();let best=null,bd=1e9;
+  for(const b of S.b){const ind=indicator(b,n);if(!ind)continue;const d=DEFS[b.type],p=P(b.x+d.w/2,b.y+d.h/2,d.ht+(ind.bar!==undefined?8:20)),dist=Math.hypot(w[0]-p[0],w[1]-p[1]);
+    if(dist<r&&dist<bd){bd=dist;best=b;}}
+  return best;}
+/* normal play: a bubble, then whatever needs action, then what you actually touched */
+function pickTap(w){const bb=bubbleHit(w);if(bb)return bb;const h=hits(w);
+  const a=h.find(x=>x.foot&&actionable(x.b))||h.find(x=>actionable(x.b));if(a)return a.b;const o=h.find(x=>x.op);if(o)return o.b;return h[0]?h[0].b:null;}
+/* move / remove / visiting: a flat item's own tile wins, then what you actually touched */
+function pick(w){const h=hits(w);
+  const f=h.find(x=>x.foot&&DEFS[x.b.type].ht<=18);if(f)return f.b;const o=h.find(x=>x.op);if(o)return o.b;return h[0]?h[0].b:null;}
 function tap(sx,sy){
   const w=s2w(sx,sy),t=w2t(w[0],w[1]);
   if(visiting){const vb=pick(w);if(vb)showSheet(vb);else hideSheet();return;}
@@ -1142,7 +1170,7 @@ function tap(sx,sy){
     updChip();return;}
   const gi=hitGhost(w);
   if(gi>=0){const g=ghosts.splice(gi,1)[0],c=3+Math.floor(Math.random()*4);addCandy(c);floatAt(g.x,g.y,30,'+'+c+' candy','#7a4fb0');save();return;}
-  const b=pick(w);
+  const b=pickTap(w);
   if(b){if(sheetB&&sheetB!==b)hideSheet();interact(b);return;}
   hideSheet();
   if(inMap(t[0],t[1])&&!unlocked(t[0],t[1]))openExpand();
@@ -1151,6 +1179,7 @@ function tap(sx,sy){
 /* ---------- input ---------- */
 const ptrs=new Map();let drag=null,pinch=null;
 cv.addEventListener('pointerdown',e=>{
+  lastPT=e.pointerType||'mouse';
   try{cv.setPointerCapture(e.pointerId);}catch(_){}
   ptrs.set(e.pointerId,[e.clientX,e.clientY]);
   const w=s2w(e.clientX,e.clientY);hover=w2t(w[0],w[1]);
