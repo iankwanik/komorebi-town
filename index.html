@@ -79,7 +79,10 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .xptxt{font-size:10.5px;color:var(--ink-2);font-variant-numeric:tabular-nums;margin-top:2px;font-weight:700}
 .stat{display:flex;align-items:center;gap:5px;padding:5px 10px 5px 6px;font-weight:800;font-size:14px;font-variant-numeric:tabular-nums;line-height:1.1}
 .stat svg{width:22px;height:22px;flex:none}
-#gCap.full{color:#c8402e}#gCap.near{color:#e07a10}
+#gCap.full{color:#c8402e}
+.lgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}.lday{position:relative;border:2px solid var(--paper-2);border-radius:12px;padding:6px 4px;text-align:center;background:#fff;font-size:11.5px;display:flex;flex-direction:column;gap:2px}
+.lday b{font-size:12px}.lday.cur{border-color:#f0b429;background:#fff6dc;box-shadow:0 0 10px rgba(240,180,41,.6)}.lday.done{opacity:.55}.lday i{position:absolute;top:2px;right:6px;color:#4f7f2e;font-style:normal;font-weight:900}.lday.big{grid-column:span 2;background:linear-gradient(160deg,#fff8dc,#ffe9a8)}
+.coop{border:2px solid var(--paper-2);border-radius:12px;padding:8px 10px;margin:6px 0;background:#fffaf0;display:flex;flex-direction:column;gap:3px}.coop small{color:var(--ink-2);font-weight:700}.ctiers{display:flex;flex-wrap:wrap;gap:4px 8px}.ctier{font-size:12px;font-weight:800}.ctier.done{color:#4f7f2e}#gCap.near{color:#e07a10}
 .bset{border:2px solid var(--paper-2);border-radius:12px;padding:6px 8px;margin:6px 0;background:#fff}.bhead{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}.bhead small{color:var(--ink-2);font-weight:700}.bhead .ok{color:#4f7f2e}
 .bgrid{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}.bst canvas{width:40px;height:33px;display:block}.bst{border-radius:8px;background:#f1efe6}.bst:not(.on) canvas{filter:grayscale(1) brightness(.35);opacity:.35}.bst.on{background:#fff6dc}
 ul.exam{list-style:none;padding:0}ul.exam li{font-weight:800;color:#c8402e;margin:4px 0}ul.exam li.ok{color:#4f7f2e}.panel.lvl{cursor:pointer}
@@ -387,7 +390,7 @@ if (PLATFORM === "crazygames") {
   };
   window.cloud.uid = () => (auth.currentUser ? auth.currentUser.uid : null);
   window.cloud.saveBoard = async entry => {
-    await setDoc(doc(db, "leaderboard", auth.currentUser.uid), { ...entry, updated: serverTimestamp() });
+    await setDoc(doc(db, "leaderboard", auth.currentUser.uid), { ...entry, updated: serverTimestamp() }, { merge: true });
   };
   window.cloud.loadBoard = async field => {
     const snap = await getDocs(query(collection(db, "leaderboard"), orderBy(field, "desc"), limit(50)));
@@ -580,7 +583,7 @@ function resOf(b){const d=DEFS[b.type];return d.res?Math.round(d.res*RES_MULT[lv
 /* each field earns its own stars; seasonal crops give +50% during their season */
 function yieldOf(d,b){return Math.round(d.yield*YIELD_MULT[b?bStars(b):0]*(d.season&&d.season===ENV().season?1.5:1)*(b&&hasRT(b,2)?1.1:1));}
 /* upgrade price follows what the building earns now, so it stays a real choice at every stage */
-function upCost(b){const d=DEFS[b.type],L=lvOf(b);if(d.kura)return L>=3?null:{to:L+1,need:0,yen:[20000,50000][L-1],goods:0,koban:[3,8][L-1]};if(L>=3||!(d.cat==='shop'||d.cat==='home'))return null;
+function upCost(b){const d=DEFS[b.type],L=lvOf(b);if(d.gate)return L>=3?null:{to:L+1,need:0,yen:[30000,120000][L-1],goods:[3000,10000][L-1],koban:[0,10][L-1],lvl:[12,20][L-1]};if(d.kura)return L>=3?null:{to:L+1,need:0,yen:[20000,50000][L-1],goods:0,koban:[3,8][L-1]};if(L>=3||!(d.cat==='shop'||d.cat==='home'))return null;
   const inc=d.cat==='shop'?baseEarn(b):rentOf(b);
   return{to:L+1,need:L,yen:Math.max(200,Math.round(inc*(L===1?6:11)/10)*10),goods:d.cat==='shop'?d.supply*(L===1?12:30):Math.max(50,d.res*(L===1?25:60))};}
 const MILES=[[30,'¥500',s=>{s.yen+=500;}],[100,'8 energy',s=>{s.energy+=8;}],[200,'120 goods',s=>{s.goods+=120;}],[400,'Golden Pumpkin (limited)',s=>{E().gold=true;}]];
@@ -735,7 +738,7 @@ async function pushCloud(force){
   catch(e){cloudDirty=true;setCloud('err');console.warn('Cloud save failed',e);}
   cloudBusy=false;
   pushBoard();}
-setInterval(()=>pushCloud(),8000);
+setInterval(()=>pushCloud(),8000);setInterval(()=>weeklyReward(),60000);setTimeout(()=>weeklyReward(),15000);
 function useTown(o){S=normalize(o);rebuild();walkers.length=0;floats.length=0;setMode(null);hideSheet();closeDrawer();dirty=true;flush();fitCam();updHUD();updQuest();}
 function townLabel(o){return (o.town?esc(o.town)+'<br>':'')+'Level '+o.lvl+' · ¥'+num(o.yen)+' · '+o.b.length+' buildings';}
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -784,7 +787,7 @@ function totalXp(){let t=S.xp;for(let l=1;l<S.lvl;l++)t+=need(l);return t;}
 async function pushBoard(){
   if(!cloudUser||!window.cloud||!S.name||visiting)return;
   recompute();
-  const e={name:S.name,town:S.town||'Komorebi Town',title:S.title||'',level:S.lvl|0,totalXp:totalXp()|0,tourists:D.tourists|0,buildings:S.b.length|0,code:myCode()};
+  const e={name:S.name,town:S.town||'Komorebi Town',title:S.title||'',level:S.lvl|0,totalXp:totalXp()|0,tourists:D.tourists|0,buildings:S.b.length|0,code:myCode(),wk:wkKey()};e['wk_'+wkKey()]=wkPts();
   const k=JSON.stringify(e);if(k===lastBoard)return;
   try{await window.cloud.saveBoard(e);lastBoard=k;}
   catch(err){console.warn('Leaderboard update failed',err);if(!boardWarned){boardWarned=true;toast('Leaderboard could not update. Check the Firestore rules.');}}
@@ -795,11 +798,11 @@ async function fillBoard(card){
   list.innerHTML='<li class="empty">Loading…</li>';
   try{
     if(cloudUser)await pushBoard();
-    const f=boardField,rows=await window.cloud.loadBoard(f==='level'?'totalXp':'tourists');
+    const f=boardField,rows=(await window.cloud.loadBoard(f==='level'?'totalXp':f==='week'?'wk_'+wkKey():'tourists')).filter(r=>f!=='week'||(r['wk_'+wkKey()]|0)>0);
     if(!list.isConnected||f!==boardField)return;
     if(!rows.length){list.innerHTML='<li class="empty">No mayors yet. Be the first!</li>';return;}
     const me=window.cloud.uid();
-    list.innerHTML=rows.map((r,i)=>'<li class="'+(r.uid===me?'me':'')+'"'+(r.uid===me?'':' data-i="'+i+'"')+'><span class="rk">'+(i+1)+'</span><span class="who"><span class="nm">'+esc(r.name||'Mayor')+(r.uid===me?' (you)':'')+'</span><span class="tw">'+esc(r.town||'')+(r.title?' '+ttlHTML(r.title):'')+'</span></span><span class="val">'+(f==='level'?'Lv '+(r.level|0):num(r.tourists|0)+' <small>tourists</small>')+'</span></li>').join('');
+    list.innerHTML=rows.map((r,i)=>'<li class="'+(r.uid===me?'me':'')+'"'+(r.uid===me?'':' data-i="'+i+'"')+'><span class="rk">'+(i+1)+'</span><span class="who"><span class="nm">'+esc(r.name||'Mayor')+(r.uid===me?' (you)':'')+'</span><span class="tw">'+esc(r.town||'')+(r.title?' '+ttlHTML(r.title):'')+'</span></span><span class="val">'+(f==='level'?'Lv '+(r.level|0):f==='week'?num(r['wk_'+wkKey()]|0)+' <small>points</small>':num(r.tourists|0)+' <small>tourists</small>')+'</span></li>').join('');
     list.querySelectorAll('li[data-i]').forEach(li=>li.onclick=()=>{const r=rows[+li.dataset.i];nextModal();openPlayer(r);});
   }catch(e){console.warn(e);if(list.isConnected)list.innerHTML='<li class="empty">Could not load the leaderboard. Try again soon.</li>';}
 }
@@ -810,7 +813,7 @@ function openBoard(){
   if(!cloudUser)btns.push({label:'Sign in to join',fn:signIn});
   else{btns.push({label:S.name?'Change names':'Choose name',fn:()=>openName(!S.name)});btns.push({label:'Friends',fn:openFriends});}
   btns.push({label:'Close',cls:'primary'});
-  modal('<h2>Top Mayors</h2>'+you+'<p style="font-size:12px">Tap a mayor to visit their town.</p><div class="btabs"><button class="tab btab" data-f="tourists">Most tourists</button><button class="tab btab" data-f="level">Highest level</button></div><ol class="board"></ol>',btns,
+  modal('<h2>Top Mayors</h2>'+you+'<p style="font-size:12px">Tap a mayor to visit their town.</p><div class="btabs"><button class="tab btab" data-f="tourists">Most tourists</button><button class="tab btab" data-f="level">Highest level</button><button class="tab btab" data-f="week">This week</button></div><p class="gnote" style="font-size:12px">This week: top 10 win titles and koban. Ends in '+fmt((wkEnd()-Date.now())/1000)+'. Your points: '+num(wkPts())+'</p><ol class="board"></ol>',btns,
     card=>{card.querySelectorAll('.btab').forEach(b=>b.onclick=()=>{boardField=b.dataset.f;fillBoard(card);});fillBoard(card);});
 }
 document.getElementById('boardBtn').onclick=openBoard;
@@ -835,7 +838,7 @@ function openFriends(){
   modal('<h2>Friends</h2><p>Share your friend code so others can add you. Visit a friend and tap Help once a day: you both get a reward.</p>'+
     '<div class="codebox"><span id="myCode">'+esc(myCode())+'</span><button class="btn" id="copyCode">Copy</button></div>'+
     '<div class="field"><label for="fCode">Add a friend by code</label><div class="row"><input id="fCode" maxlength="6" placeholder="ABC123" autocomplete="off" spellcheck="false"><button class="btn primary" id="addCode">Add</button></div></div>'+
-    '<ol class="board" id="friendList"></ol>',
+    '<div id="coopBox"></div><ol class="board" id="friendList"></ol>',
     [{label:'Leaderboard',fn:()=>openBoard()},{label:'Close',cls:'primary'}],
     card=>{
       card.querySelector('#copyCode').onclick=()=>{const t=myCode();const sel=()=>{const r=document.createRange();r.selectNodeContents(card.querySelector('#myCode'));const g=getSelection();g.removeAllRanges();g.addRange(r);toast('Code selected. Copy it to share.');};
@@ -848,14 +851,17 @@ function openFriends(){
 async function renderFriends(card,refresh){
   const list=card.querySelector('#friendList');if(!list)return;
   const draw=()=>{if(!list.isConnected)return;
+    {const cb=card.querySelector('#coopBox');if(cb&&!S.friends.length)cb.innerHTML=coopHTML();}
     if(!S.friends.length){list.innerHTML='<li class="empty">No friends yet. Add one with a code, or tap a mayor on the leaderboard.</li>';return;}
-    list.innerHTML=S.friends.map((f,i)=>{const done=S.helped[f.uid]===today();return '<li><span class="rk">'+(i+1)+'</span><span class="who"><span class="nm">'+esc(f.name)+'</span><span class="tw">'+esc(f.town||'')+(f.level?' · Lv '+f.level:'')+(done?' · helped today':'')+'</span></span><span class="val acts"><button class="btn mini" data-v="'+i+'">Visit</button><button class="btn mini ghost" data-r="'+i+'" aria-label="Remove friend">✕</button></span></li>';}).join('');
+    list.innerHTML=S.friends.map((f,i)=>{const done=S.helped[f.uid]===today();return '<li><span class="rk">'+(i+1)+'</span><span class="who"><span class="nm">'+esc(f.name)+'</span><span class="tw">'+esc(f.town||'')+(f.level?' · Lv '+f.level:'')+(done?' · helped today':'')+'</span></span><span class="val acts"><button class="btn mini" data-v="'+i+'">Visit</button><button class="btn mini" data-gf="'+i+'">Gift</button><button class="btn mini ghost" data-r="'+i+'" aria-label="Remove friend">✕</button></span></li>';}).join('');
     list.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const f=S.friends[+b.dataset.v];nextModal();visitFriend(f.uid,f.name);});
+    list.querySelectorAll('[data-gf]').forEach(b=>b.onclick=()=>{const f=S.friends[+b.dataset.gf];nextModal();openGift(f);});
+    {const cb=card.querySelector('#coopBox');if(cb){cb.innerHTML=coopHTML();cb.querySelectorAll('[data-coop]').forEach(b=>b.onclick=()=>{claimCoop(+b.dataset.coop);draw();});}}
     list.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{if(b.dataset.armed){S.friends.splice(+b.dataset.r,1);save();draw();return;}b.dataset.armed='1';b.textContent='Remove?';});};
   draw();
   if(refresh&&S.friends.length){
     const infos=await Promise.all(S.friends.map(f=>window.cloud.getBoard(f.uid).catch(()=>null)));
-    let changed=false;infos.forEach((inf,i)=>{const f=S.friends[i];if(inf&&f&&f.uid===inf.uid){f.name=clean(inf.name,20)||f.name;f.town=clean(inf.town,24);f.level=inf.level|0;changed=true;}});
+    let changed=false;infos.forEach((inf,i)=>{const f=S.friends[i];if(inf&&f&&f.uid===inf.uid){f.name=clean(inf.name,20)||f.name;f.town=clean(inf.town,24);f.level=inf.level|0;f.wkK=inf.wk;f.wk=inf['wk_'+inf.wk]|0;changed=true;}});
     if(changed){save();draw();}}}
 document.getElementById('friendsBtn').onclick=openFriends;
 
@@ -899,11 +905,11 @@ async function checkInbox(){
   if(!cloudUser||!window.cloud||visiting)return;
   try{
     const items=await window.cloud.readInbox();if(!items.length)return;
-    let y=0,e=0,c=0;const names=[];
-    for(const it of items){try{await window.cloud.deleteInbox(it.id);}catch(err){continue;}y+=40;e+=1;if(eventOn())c+=5;const nm=clean(it.fromName,20)||'A friend';if(!names.includes(nm))names.push(nm);}
-    if(!y||visiting)return;
-    S.yen+=y;S.energy+=e;if(c)addCandy(c);save();
-    modal('<div class="big">'+TANUKI+'</div><h2>Friends helped your town!</h2><p>'+esc(names.slice(0,5).join(', '))+(names.length>5?' and others':'')+' stopped by to help.</p><p><b>+¥'+num(y)+' · +'+e+' energy'+(c?' · +'+c+' candy':'')+'</b></p>',[{label:'Thank you',cls:'primary'}]);
+    let y=0,e=0,c=0,gg=0;const gi={},names=[];
+    for(const it of items){try{await window.cloud.deleteInbox(it.id);}catch(err){continue;}if(it.kind==='gift'){const a=Math.max(0,Math.min(it.g==='goods'?GIFT_GOODS:GIFT_ING,it.a|0));if(it.g==='goods')gg+=a;else if(ING[it.g])gi[it.g]=(gi[it.g]||0)+a;}else{y+=40;e+=1;if(eventOn())c+=5;}const nm=clean(it.fromName,20)||'A friend';if(!names.includes(nm))names.push(nm);}
+    if((!y&&!gg&&!Object.keys(gi).length)||visiting)return;
+    S.yen+=y;S.energy+=e;if(c)addCandy(c);S.goods+=gg;for(const k in gi)S.ing[k]=(S.ing[k]|0)+gi[k];save();
+    modal('<div class="big">'+TANUKI+'</div><h2>Friends helped your town!</h2><p>'+esc(names.slice(0,5).join(', '))+(names.length>5?' and others':'')+' stopped by to help.</p><p><b>+¥'+num(y)+' · +'+e+' energy'+(c?' · +'+c+' candy':'')+(gg?' · +'+num(gg)+' goods':'')+Object.keys(gi).map(k=>' · +'+gi[k]+' '+ING[k].n.toLowerCase()).join('')+'</b></p>',[{label:'Thank you',cls:'primary'}]);
   }catch(err){console.warn('Inbox check failed',err);}}
 setInterval(checkInbox,120000);
 
@@ -979,7 +985,7 @@ function calcFoot(){FF.fill(0);TR.clear();FFB.clear();
   for(const b of S.b){const d=DEFS[b.type];if(!needsRoad(d))continue;const rs=roadsNext(b);if(rs.length)TR.add(b.id);}
   for(const b of S.b){const d=DEFS[b.type];if(!needsRoad(d)||!b._ap)continue;const rs=roadsNext(b);if(rs.length)spread(rs,b._ap,4);}
   for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++)if(S.roads[y*MAP+x]===5)spread([[x,y]],4,2);
-  if(GATE)spread([[GATE.rx,GATE.ry]],10+S.lvl,5);
+  if(GATE){const gl=lvOf(GATE.b);spread([[GATE.rx,GATE.ry]],(10+S.lvl)*[1,1.6,2.4][gl-1],5+gl);}
   for(const b of S.b){if(DEFS[b.type].cat!=='shop')continue;let f=0;for(const [x,y] of roadsNext(b))f=Math.max(f,FF[y*MAP+x]);FFB.set(b.id,f);}
   ffDirty=false;}
 const ffRatio=f=>Math.min(1,Math.log10(1+f)/Math.log10(1+FF_MAX));
@@ -1011,12 +1017,12 @@ function rebuild(){
   forest=[];for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++)if(!unlocked(x,y)&&hash(x,y)<(edgeDist(x,y)<=3?.48:.2))forest.push({x:x+.3+hash(y,x)*.4,y:y+.3+hash(x+3,y)*.4,s:.75+hash(x,y+7)*.5,dec:hash(x+11,y+5)<.35?hash(x+11,y+5):0});
   buildAdj();ffDirty=true;recompute();if(ffDirty)calcFoot();
 }
-function recompute(){TCNT={};for(const b of S.b)TCNT[b.type]=(TCNT[b.type]||0)+1;const g=graceOn();if(g!==ffG){ffG=g;ffDirty=true;}if(ffDirty)calcFoot();let a=0,r=0,s=0,o=0;const seen={};for(const b of S.b){const d=DEFS[b.type];if(d.appeal){let v=d.appeal;if(v>=40){seen[d.id]=(seen[d.id]||0)+1;if(seen[d.id]>1)v*=.5;}if(needsRoad(d))v*=decorFactor(b);if(b._ap!==v){b._ap=v;ffDirty=true;}a+=v;}if(d.res)r+=resOf(b);if(d.staff){s+=d.staff;if(nearRoad(b))o++;}}a=Math.round(a+avenueTiles*4);D.appeal=a;D.res=r;D.staff=s;D.open=o;D.tourists=a*3+o*5;D.mult=touristMult(D.tourists);}
+function recompute(){TCNT={};for(const b of S.b)TCNT[b.type]=(TCNT[b.type]||0)+1;const g=graceOn();if(g!==ffG){ffG=g;ffDirty=true;}if(ffDirty)calcFoot();let a=0,r=0,s=0,o=0;const seen={};for(const b of S.b){const d=DEFS[b.type];if(d.appeal){let v=d.appeal;if(v>=40){seen[d.id]=(seen[d.id]||0)+1;if(seen[d.id]>1)v*=.5;}if(needsRoad(d))v*=decorFactor(b);if(b._ap!==v){b._ap=v;ffDirty=true;}a+=v;}if(d.res)r+=resOf(b);if(d.staff){s+=d.staff;if(nearRoad(b))o++;}}a=Math.round(a+avenueTiles*4+gateAp());D.appeal=a;D.res=r;D.staff=s;D.open=o;D.tourists=Math.round((a*3+o*5)*wxTour());D.mult=touristMult(D.tourists);}
 /* tourist bonus: x2 at 300 tourists, about x2.9 at 1,000, then grows slowly (2,500 tourists = about x3.2) */
 function touristMult(t){if(t<=300)return 1+t/300;if(t<=1000)return 2+(Math.sqrt(t)-Math.sqrt(300))/16.34;return 2.875+(Math.sqrt(t)-Math.sqrt(1000))/50;}
 function canPlace(t,x,y,ign){const d=DEFS[t];for(let i=0;i<d.w;i++)for(let j=0;j<d.h;j++){const X=x+i,Y=y+j;if(!inMap(X,Y)||!unlocked(X,Y)||anyRoad(X,Y))return false;const o=occ[Y*MAP+X];if(o&&o!==ign)return false;}return true;}
 function anchor(t,tx,ty){const d=DEFS[t];return{x:tx-Math.floor((d.w-1)/2),y:ty-Math.floor((d.h-1)/2)};}
-function prog(b,n){const d=DEFS[b.type];if(d.cat==='farm')return b.st==='empty'?0:(n-b.t)/(d.grow*1000);if(d.cat==='shop')return b.st==='idle'?0:(n-b.t)/(d.time*1000);if(d.cat==='home')return (n-b.t)/(d.time*1000);return 0;}
+function prog(b,n){const d=DEFS[b.type];if(d.cat==='farm')return b.st==='empty'?0:(n-b.t)/(d.grow*1000)*(WX().k==='rain'?1.1:1);if(d.cat==='shop')return b.st==='idle'?0:(n-b.t)/(d.time*1000);if(d.cat==='home')return (n-b.t)/(d.time*1000);return 0;}
 
 /* ---------- world clock: four seasons (one week each) and day and night (20 minutes) ---------- */
 const DAY_MS=20*60*1000, WEEK0=new Date(2026,9,26), AWAY_MIN=10*60*1000;
@@ -1724,7 +1730,7 @@ const UPG={
 /* height of the tallest new detail at Lv 2 and Lv 3, so bubbles sit above it */
 const LVH={dango:[0,8],ramen:[18,25],sushi:[18,36],izakaya:[18,25],teahouse:[0,8],souvenir:[0,6],onsen:[0,0],takoyaki:[0,18],dojo:[0,10],kabuki:[0,18],kitsune:[0,0],
  udon:[0,22],yakitori:[0,0],wagashi:[0,4],parfait:[0,0],wagyugrill:[0,4],kaiseki:[0,0],machiya:[0,8],minka:[0,0],nagaya:[0,4],ryokan:[0,4],samurai:[0,0],villa:[0,0]};
-function htOf(b){const d=DEFS[b.type],L=lvOf(b),sk=skinOf(b);return d.ht+(L>1&&(d.cat==='shop'||d.cat==='home')?(LVH[b.type]||[0,0])[L-2]:0)+(sk&&sk.h||0);}
+function htOf(b){const d=DEFS[b.type],L=lvOf(b),sk=skinOf(b);return d.ht+(L>1&&(d.cat==='shop'||d.cat==='home')?(LVH[b.type]||[0,0])[L-2]:0)+(d.gate&&L>1?[0,-12,-18][L-1]:0)+(sk&&sk.h||0);}
 /* farm stars: each crop gets its own ★, ★★ and ★★★ details */
 const FUP={
  rice:{b(b,k,n){const x=b.x,y=b.y;if(k>=2){pRack(x+.15,y+.04,.7,14,['#e2b64a'],n);}},f(b,k,n){const x=b.x,y=b.y;pScare(x+.1,y+.9,.75,n);if(k>=3){pToriiMini(x+.9,y+.18,.7);pFox(x+.84,y+.08);}}},
@@ -2183,7 +2189,7 @@ function newWalker(){const g=GATE,r=g?[g.rx,g.ry]:rnd(roadTiles),k=rnd(KINDS);
     c:k==='elder'?rnd(['#6b5a4a','#4a5368','#5d6b4f','#6e4a52']):rnd(KIM),c2:rnd(KIM),sh:rnd(SHIRT),skin:rnd(SKINS),hair:k==='elder'?'#d2cdc5':rnd(HAIRS),
     par:k==='kimono'&&Math.random()<.4,lan:Math.random()<.4,hat:Math.random()<.55,bal:k==='kid'&&Math.random()<.45,fan:Math.random()<.35,
     ox:(Math.random()-.5)*.42,oy:(Math.random()-.5)*.42,ph:Math.random()*6,st:'walk',q:0,cool:1+Math.random()*5,face:Math.random()<.5?-1:1,af:null,afT:0,X:r[0]+.5,Y:r[1]+.5,A:1,mv:true,fl:0,life:60+Math.random()*100,leave:false,...(g?{st:'out',q:0,from:[r[0]+.5,r[1]+.5],door:g.door.slice(),vis:null}:{})};}
-if(window.__envOverride)window.__kt={walkers,pops,popAt:(...a)=>popAt(...a),env:()=>ENV(),lights:()=>LIGHTS.length,flushNow:()=>{dirty=true;flush();},thumb:(...a)=>thumb(...a),S:()=>S,tut:()=>TUT&&{txt:TUT.txt,tile:TUT.tile||null,wait:!!TUT.wait,b:TUT.b?TUT.b.id:null},scr:(x,y)=>w2s(...P(x+.5,y+.5,0))};
+if(window.__envOverride)window.__kt={walkers,pops,popAt:(...a)=>popAt(...a),env:()=>ENV(),lights:()=>LIGHTS.length,flushNow:()=>{dirty=true;flush();},thumb:(...a)=>thumb(...a),S:()=>S,wx:()=>WX().k,tut:()=>TUT&&{txt:TUT.txt,tile:TUT.tile||null,wait:!!TUT.wait,b:TUT.b?TUT.b.id:null},scr:(x,y)=>w2s(...P(x+.5,y+.5,0))};
 let GATE=null,GD=new Int16Array(MAP*MAP),spawnT=0;
 function calcGate(){GATE=null;GD.fill(-1);const g=S.b.find(b=>b.type==='gate');if(!g)return;const nb=[[0,1],[1,0],[0,-1],[-1,0]];let r=null;
   for(const [a,c] of nb)if(isRoad(g.x+a,g.y+c)){r=[g.x+a,g.y+c];break;}if(!r)return;
@@ -2209,7 +2215,7 @@ function updWalkers(dt){
   const want=Math.min(52,Math.floor(D.tourists/4));
   if(!GATE){while(walkers.length<want)walkers.push(newWalker());if(walkers.length>want)walkers.length=want;}
   else{let live=0;for(const w of walkers)if(!w.leave)live++;
-    if(live<want){spawnT+=dt;if(spawnT>(live<want*.5?.25:.7)){spawnT=0;walkers.push(newWalker());}}
+    if(live<want){spawnT+=dt;if(spawnT>(live<want*.5?.25:.7)/(GATE?[1,1.3,1.6][lvOf(GATE.b)-1]:1)){spawnT=0;walkers.push(newWalker());}}
     else if(live>want){let extra=live-want;for(const w of walkers){if(extra<=0)break;if(!w.leave){w.leave=true;extra--;}}}}
   const now=Date.now();
   for(const w of walkers){
@@ -2397,7 +2403,7 @@ function draw(n){
     else if(it[1]===4){const rd=it[2];if(rd.k===4)lampPost(rd.x,rd.y);else avenueTree(rd.x,rd.y);}
     else{const g=it[2],fake={x:g.x,y:g.y,type:g.t,st:g.mv?moving.st:(DEFS[g.t].cat==='farm'?'empty':'idle'),t:g.mv?moving.t:n};ctx.globalAlpha=.7;DR[g.t](fake,n,g.mv?prog(moving,n):0);ctx.globalAlpha=1;}
   }
-  drawNight(e,n);drawParticles(e,n);
+  drawNight(e,n);drawParticles(e,n);drawWeather(n);
   // indicators
   const s=clamp(1/cam.z,.85,1.7);
   if(!mode&&!visiting)for(const b of S.b){const ind=indicator(b,n);if(!ind)continue;const d=DEFS[b.type],p=P(b.x+d.w/2,b.y+d.h/2,htOf(b)+(ind.bar!==undefined?8:20));
@@ -2486,10 +2492,11 @@ function doUpgrade(b){const c=upCost(b),d=DEFS[b.type];if(!c||visiting)return;
   if(bStars(b)<c.need){toast('Earn '+'★'.repeat(c.need)+' first by collecting from it.');return;}
   if(S.yen<c.yen){toast('You need ¥'+num(c.yen-S.yen)+' more.');return;}
   if(S.goods<c.goods){toast('You need '+num(c.goods-S.goods)+' more goods.');return;}
+  if(c.lvl&&S.lvl<c.lvl){toast('This upgrade unlocks at level '+c.lvl+'.');return;}
   if(c.koban&&S.koban<c.koban){toast('You need '+(c.koban-S.koban)+' more koban.');return;}
   S.yen-=c.yen;S.goods-=c.goods;S.koban-=c.koban||0;b.lv=c.to;S.c.upg=(S.c.upg||0)+1;if(b.lv===3)S.c.lv3=(S.c.lv3||0)+1;
   recompute();float(b,'Lv '+b.lv+'!','#7a4fb0');gainXp(Math.max(5,Math.round(c.yen/40)));save();
-  toast(d.n+' upgraded to Lv '+b.lv+'! '+(d.kura?'It now stores '+num(KCAP[b.lv-1])+' goods.':d.cat==='home'?'More rent and residents.':'More income.'));thumb($('#sThumb'),b.type,b);updSheet();}
+  toast(d.n+' upgraded to Lv '+b.lv+'! '+(d.gate?(b.lv===2?'A train station! More tourists arrive by train.':'A bullet-train station! Even more tourists.'):d.kura?'It now stores '+num(KCAP[b.lv-1])+' goods.':d.cat==='home'?'More rent and residents.':'More income.'));thumb($('#sThumb'),b.type,b);updSheet();}
 function canRemove(b){const d=DEFS[b.type];if(d.uniq){toast('The '+d.n+' stays, but you can move it.');return false;}if(d.res&&D.res-resOf(b)<D.staff){toast('Your shops need these residents as staff.');return false;}return true;}
 function removeB(b){if(!canRemove(b))return;const r=refund(b);S.yen+=r;S.b=S.b.filter(x=>x!==b);if(sheetB===b)hideSheet();removeSel=null;rebuild();save();toast(DEFS[b.type].n+' removed. +¥'+num(r));}
 /* ---------- tap picking: bubbles first, then pixel-accurate hits, then smart priority ---------- */
@@ -2660,7 +2667,7 @@ function updSheet(){if(!sheetB)return;const b=sheetB,d=DEFS[b.type],n=Date.now()
   else if(d.cat==='farm'){const y=yieldOf(d,b);if(b.st==='empty')st='Empty. Tap it to plant for ¥'+d.plant+'.';else if(p>=1)st='Ready! Tap to harvest '+y+' '+unitOf(d)+'.';else{st='Growing · ready in '+fmt(d.grow*(1-p))+' · '+y+' '+unitOf(d);barv=p;}}
   else if(d.cat==='shop'){const e=earnOf(b);if(b.st==='idle')st='Waiting for '+needTxt(d,b)+' · earns ¥'+num(e);else if(p>=1)st='Ready! Tap to collect ¥'+num(e)+'.';else{st='Serving tourists · ¥'+num(e)+' in '+fmt(d.time*(1-p));barv=p;}}
   else if(d.cat==='home'){if(p>=1)st=resOf(b)+' residents · rent ¥'+num(rentOf(b))+' is ready';else{st=resOf(b)+' residents · rent ¥'+num(rentOf(b))+' in '+fmt(d.time*(1-p));barv=p;}}
-  else if(d.gate){st=GATE&&GATE.b===b?'Tourists arrive and leave through this gate.':'Not next to a road. Move it beside a road so tourists can come in.';}
+  else if(d.gate){st=GATE&&GATE.b===b?(lvOf(b)>1?(lvOf(b)===2?'Train station':'Bullet-train station')+': +'+GATE_AP[lvOf(b)-1]*3+' tourists and busier streets nearby.':'Tourists arrive and leave through this gate. Upgrade it to a train station!'):'Not next to a road. Move it beside a road so tourists can come in.';}
   else if(d.tip){const f=tipFill(),a=tipAmount();st=visiting?'Tourists leave tips here.':(a>=1?'¥'+num(a)+' in tips · tap to collect':'Empty · tourists drop tips over time')+' · '+(f>=1?'full!':'full in '+fmt((1-f)*tipCapH()*3600))+' · holds '+tipCapH()+'h';barv=f;}
   else if(d.kura)st='Stores '+num(KCAP[lvOf(b)-1])+' goods · your limit is '+num(goodsCap())+' goods and '+num(ingCap())+' of each ingredient';
   else if(needsRoad(d)&&!TR.has(b.id))st=(graceOn()?'Not by a road: half appeal for '+fmt(((S.ffT||0)+FF_GRACE-Date.now())/1000)+', then none':'Not by a road: brings no tourists')+'. Move it next to a road.'
@@ -2675,7 +2682,7 @@ function updSheet(){if(!sheetB)return;const b=sheetB,d=DEFS[b.type],n=Date.now()
   se.innerHTML=sh;se.hidden=!sh;
   const fc=finishCost(b),fb=$('#sFin');fb.hidden=!fc;if(fc)fb.textContent='Finish now · ¥'+num(fc);
   const c=visiting?null:upCost(b);up.hidden=!c;
-  if(c){const ok=bStars(b)>=c.need;up.classList.toggle('locked',!ok);const ex=c.koban?' + '+c.koban+' koban':' + '+num(c.goods)+' goods';up.textContent=ok?'Upgrade to Lv '+c.to+' · ¥'+num(c.yen)+ex:'Lv '+c.to+': ¥'+num(c.yen)+ex+' · needs '+'★'.repeat(c.need);}$('#sMove').hidden=!!visiting;$('#sSell').hidden=!!visiting||!!d.uniq;$('#sBarW').hidden=barv===null;if(barv!==null)$('#sBar').style.width=(clamp(barv,0,1)*100)+'%';}
+  if(c){const ok=bStars(b)>=c.need;up.classList.toggle('locked',!ok);const ex=(c.goods?' + '+num(c.goods)+' goods':'')+(c.koban?' + '+c.koban+' koban':'')+(c.lvl&&S.lvl<c.lvl?' · needs level '+c.lvl:'');up.textContent=ok?'Upgrade to Lv '+c.to+' · ¥'+num(c.yen)+ex:'Lv '+c.to+': ¥'+num(c.yen)+ex+' · needs '+'★'.repeat(c.need);}$('#sMove').hidden=!!visiting;$('#sSell').hidden=!!visiting||!!d.uniq;$('#sBarW').hidden=barv===null;if(barv!==null)$('#sBar').style.width=(clamp(barv,0,1)*100)+'%';}
 $('#sMove').onclick=()=>{const b=sheetB;setMode('move');moving=b;updChip();};
 $('#sUp').onclick=()=>{if(sheetB)doUpgrade(sheetB);};
 $('#sSkin').onclick=()=>{if(sheetB)openSkins(sheetB);};
@@ -2852,7 +2859,7 @@ function autoPlace(o,type,border){if(o.b.some(b=>b.type===type))return;const sz=
   if(best)o.b.push({id:(o.nid=(o.nid||1)+1)-1,type,x:best[0],y:best[1]});}
 function ensureTipBox(o){autoPlace(o,'gate',true);autoPlace(o,'tipbox',false);}
 /* ---------- day and night bonus ---------- */
-function baseEarn(b){const d=DEFS[b.type];return Math.round(d.earn*D.mult*(1+.1*bStars(b))*LV_MULT[lvOf(b)-1]*(1+.05*perkInc())*(hasRT(b,4)?1.1:1)*(DEFS[b.type].cat==='shop'?footMult(b)*dupMult(b):1));}
+function baseEarn(b){const d=DEFS[b.type];return Math.round(d.earn*D.mult*(1+.1*bStars(b))*LV_MULT[lvOf(b)-1]*(1+.05*perkInc())*(hasRT(b,4)?1.1:1)*(DEFS[b.type].cat==='shop'?footMult(b)*dupMult(b):1)*(b.type==='onsen'&&WX().k==='snow'?1.3:1));}
 const dnOn=d=>!!d.dn&&d.dn===ENV().phase;
 const DN_TXT=d=>d.dn==='night'?'Night bonus +25%':'Day bonus +25%';
 const SUN_SVG='<svg viewBox="0 0 24 24"><path d="M12 1.8v3M12 19.2v3M1.8 12h3M19.2 12h3M4.8 4.8l2.1 2.1M17.1 17.1l2.1 2.1M4.8 19.2l2.1-2.1M17.1 6.9l2.1-2.1" stroke="#1c2541" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="5" fill="#f6c343" stroke="#1c2541" stroke-width="1.8"/></svg>';
@@ -2864,13 +2871,13 @@ const SEA_SVG={
  winter:'<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="23" fill="#e8f0f7"/><g stroke="#2f5f8f" stroke-width="2.4" stroke-linecap="round">'+[0,60,120].map(a=>'<path d="M24 9v30M20 12l4 4 4-4M20 36l4-4 4 4" transform="rotate('+a+' 24 24)"/>').join('')+'</g></svg>'};
 const fmtM=s=>s>=3600?Math.floor(s/3600)+'h':s>=60?Math.ceil(s/60)+'m':Math.max(1,Math.ceil(s))+'s';
 let _clkK='';
-function updClock(){const e=ENV(),k=e.phase+e.season;if(k!==_clkK){_clkK=k;$('#clkIco').innerHTML=e.night?MOON_SVG:SUN_SVG;$('#clockBtn').classList.toggle('night',e.night);}
-  $('#clkSea').textContent=e.sea.n+(e.night?' night':' day');$('#clkNext').textContent=(e.night?'Day':'Night')+' in '+fmtM(e.toSwitch/1000);}
+function updClock(){const e=ENV(),wk=WX().k,k=e.phase+e.season+wk;if(k!==_clkK){_clkK=k;$('#clkIco').innerHTML=wk==='rain'?RAIN_SVG:wk==='snow'?SNOW_SVG:e.night?MOON_SVG:SUN_SVG;$('#clockBtn').classList.toggle('night',e.night);}
+  $('#clkSea').textContent=e.sea.n+(e.night?' night':' day');$('#clkNext').textContent=(wk!=='sun'?WX_N[wk]+' · ':'')+(e.night?'Day':'Night')+' in '+fmtM(e.toSwitch/1000);}
 function seaCrop(id){return Object.values(DEFS).find(d=>d.cat==='farm'&&d.season===id);}
 function openClock(){const e=ENV(),dayL=Object.values(DEFS).filter(d=>d.dn==='day').map(d=>d.n),nightL=Object.values(DEFS).filter(d=>d.dn==='night').map(d=>d.n),crop=seaCrop(e.season);
   modal('<div class="big">'+SEA_SVG[e.season]+'</div><h2>'+e.sea.n+(e.night?' night':' day')+'</h2><p>'+(e.night?'Day':'Night')+' comes in <b>'+fmt(e.toSwitch/1000)+'</b>. A full day lasts 20 minutes.</p>'+
     '<p class="adnote dnbox"><b>'+SUN_SVG+' Day shops earn +25%</b><br>'+dayL.join(', ')+'</p><p class="adnote dnbox"><b>'+MOON_SVG+' Night shops earn +25%</b><br>'+nightL.join(', ')+'</p>'+
-    '<p>Finished shops wait for you, so you can collect them at the best time.</p><p><b>'+e.sea.n+'</b> ends in '+fmt((e.sEnd-Date.now())/1000)+'. '+(crop?crop.n+' gives +50% this season. ':'')+'Seasonal items are in the Build menu.</p>',
+    '<p class="adnote dnbox"><b>Weather: '+WX_N[WX().k]+'</b><br>'+(WX_FX[WX().k]||'No weather effects right now.')+' Changes in '+fmt((WX().end-Date.now())/1000)+'.</p><p>Finished shops wait for you, so you can collect them at the best time.</p><p><b>'+e.sea.n+'</b> ends in '+fmt((e.sEnd-Date.now())/1000)+'. '+(crop?crop.n+' gives +50% this season. ':'')+'Seasonal items are in the Build menu.</p>',
     [{label:'Seasonal items',fn:()=>{tab='season';openDrawer();}},{label:'Close',cls:'primary'}]);}
 /* ---------- season arrival and update news ---------- */
 function seasonNews(isNew){const e=ENV();S.tips=S.tips||{};
@@ -2907,7 +2914,7 @@ function fenceRun(x0,y0,x1,y1,col,h,n){ctx.beginPath();for(let i=0;i<=n;i++){con
 function stoneRun(x0,y0,x1,y1){const n=4;for(let i=0;i<n;i++){const t=i/n,t2=(i+.85)/n;box(x0+(x1-x0)*t-.035,y0+(y1-y0)*t-.035,(x1-x0)*(t2-t)+.07,(y1-y0)*(t2-t)+.07,0,3.4,i%2?'#bdb6a8':'#cfc8ba');}}
 /* Upgrade mode: every building shows its stars and level; a green arrow means an upgrade is ready */
 const starable=d=>d.cat==='farm'||d.cat==='shop'||d.cat==='home';
-function canUp(b){const c=upCost(b);return !!c&&!DEFS[b.type].kura&&bStars(b)>=c.need&&S.yen>=c.yen&&S.goods>=c.goods;}
+function canUp(b){const c=upCost(b);return !!c&&!DEFS[b.type].kura&&!(c.lvl&&S.lvl<c.lvl)&&S.koban>=(c.koban||0)&&bStars(b)>=c.need&&S.yen>=c.yen&&S.goods>=c.goods;}
 function upArrow(px,py,s){ctx.save();ctx.translate(px,py);ctx.scale(s,s);ctx.beginPath();ctx.arc(0,0,7,0,6.283);ctx.fillStyle='#5aa646';ctx.fill();ctx.strokeStyle='#1c2541';ctx.lineWidth=1.4;ctx.stroke();
   ctx.beginPath();ctx.moveTo(0,-4.2);ctx.lineTo(3.6,0);ctx.lineTo(1.4,0);ctx.lineTo(1.4,3.8);ctx.lineTo(-1.4,3.8);ctx.lineTo(-1.4,0);ctx.lineTo(-3.6,0);ctx.closePath();ctx.fillStyle='#fff';ctx.fill();ctx.restore();}
 function drawUpgradeView(s){for(const b of S.b){const d=DEFS[b.type];if(!starable(d))continue;const k=bStars(b),L=lvOf(b),shop=d.cat!=='farm',p=P(b.x+d.w/2,b.y+d.h/2,htOf(b)+14+((b.x+b.y)%2)*13);
@@ -2948,7 +2955,7 @@ const ACH=[
 ];
 const ACH_KOBAN=[2,5,10];
 const TITLE_R={'Rice Master':1,'Shop Tycoon':1,'Landlord':1,'Master Builder':1,'Diligent Mayor':1,'Veteran Mayor':1,'Tourist Magnet':2,'Craftsman':2,'Good Neighbour':2,'Land Baron':2,'Season Keeper':2,
- 'Millionaire':3,'Star Mayor':3,'Harvest Sage':3,'Monument Maker':3,'Merchant Prince':3,'Master Chef':4,'Living Legend':4,'Unlucky Mayor':1,'Gacha Victim':3,'Chosen by Misfortune':4,'Master Farmer':2,'Gourmet Mayor':3,'Home Builder':2,'Garden Artist':3,'Season Collector':3,'Town Historian':4};
+ 'Millionaire':3,'Star Mayor':3,'Harvest Sage':3,'Monument Maker':3,'Merchant Prince':3,'Master Chef':4,'Living Legend':4,'Unlucky Mayor':1,'Gacha Victim':3,'Chosen by Misfortune':4,'Weekly Champion':4,'Weekly Star':3,'Weekly Top 10':2,'Master Farmer':2,'Gourmet Mayor':3,'Home Builder':2,'Garden Artist':3,'Season Collector':3,'Town Historian':4};
 const RAR=['','Bronze','Silver','Gold','Legendary'];
 const ttlR=t=>TITLE_R[t]||1;
 const ttlHTML=(t,big)=>t?'<span class="ttl r'+ttlR(t)+(big?' big':'')+'">'+esc(t)+'</span>':'';
@@ -2984,7 +2991,7 @@ function dailyNow(){if(!S.daily||S.daily.d!==today())newDaily();return S.daily;}
 function dProg(i){const dl=dailyNow(),m=DPOOL.find(q=>q.id===dl.ids[i]);return Math.max(0,cval(m.k)-dl.base[i]);}
 function goalsReady(){if(visiting)return 0;if(!planning)bookDraws();const dl=dailyNow();let c=0;
   dl.ids.forEach((id,i)=>{if(!dl.claimed[i]&&dProg(i)>=dl.t[i])c++;});if(!dl.bonus&&dl.claimed.every(Boolean))c++;
-  return c+ACH.filter(achReady).length+ordersReady()+setsReady()+(vipMet(vipNow())?1:0);}
+  return c+ACH.filter(achReady).length+ordersReady()+setsReady()+(vipMet(vipNow())?1:0)+(loginDue()?1:0);}
 function giveKoban(k,why){S.koban+=k;toast('+'+k+' koban · '+why);}
 function claimDaily(i){const dl=dailyNow();if(dl.claimed[i]||dProg(i)<dl.t[i])return;dl.claimed[i]=true;S.c.daily=(S.c.daily||0)+1;S.energy+=5;giveKoban(1,'mission complete, +5 energy');save();}
 function claimBonus(){const dl=dailyNow();if(dl.bonus||!dl.claimed.every(Boolean))return;dl.bonus=true;
@@ -3160,6 +3167,94 @@ function examTick(){if(visiting||planning)return;if(S.xp>=need(S.lvl)&&EXAMS[S.l
 /* ---------- storehouse levels, ingredient limit ---------- */
 const KCAP=[3000,4500,6000];
 const ingCap=()=>500+100*kuraCount();
+/* ---------- weather: the same for everyone, changes every 3 hours ---------- */
+const WX_H=3;let _wx=null;
+function WX(){const n=Date.now(),blk=Math.floor(n/(WX_H*36e5)),ov=window.__wxOverride;if(_wx&&_wx.blk===blk&&!ov)return _wx;const e=ENV(),r=hash(blk%9973,77);let k='sun';
+  if(e.season==='winter'){if(r<.35)k='snow';}else if(r<(e.season==='autumn'?.22:.28))k='rain';if(ov)k=ov;return _wx={blk,k,end:(blk+1)*WX_H*36e5};}
+const WX_N={sun:'Clear',rain:'Rain',snow:'Snow day'};
+const WX_FX={sun:'',rain:'Farms grow 10% faster · 10% fewer tourists',snow:'Onsen earns +30% · 5% fewer tourists'};
+const wxTour=()=>{const k=WX().k;return k==='rain'?.9:k==='snow'?.95:1;};
+const RAIN_SVG='<svg viewBox="0 0 24 24"><path d="M6 14a4 4 0 0 1 .5-8A5.5 5.5 0 0 1 17 7.5 3.5 3.5 0 0 1 17.5 14z" fill="#c9d3e0" stroke="#1c2541" stroke-width="1.8"/><path d="M8 17l-1 3M12 17l-1 3M16 17l-1 3" stroke="#2f6db0" stroke-width="1.8" stroke-linecap="round"/></svg>';
+const SNOW_SVG='<svg viewBox="0 0 24 24"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9" stroke="#2f6db0" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" fill="#fff" stroke="#1c2541" stroke-width="1.4"/></svg>';
+let RAIN=[];
+function drawWeather(n){const k=WX().k;if(k==='sun')return;const c=C0;c.save();c.setTransform(dpr,0,0,dpr,0,0);
+  if(k==='rain'){c.fillStyle='rgba(40,60,90,.12)';c.fillRect(0,0,W,H);if(RAIN.length!==90)RAIN=Array.from({length:90},(_,i)=>[hash(i,3),hash(5,i),.6+hash(i,9)*.6]);
+    c.strokeStyle='rgba(200,220,245,.55)';c.lineWidth=1;c.beginPath();for(const [a,b2,s] of RAIN){const y=((b2+n/(900/s))%1)*(H+40)-20,x=(a*W+y*.18)%W;c.moveTo(x,y);c.lineTo(x-3,y+12);}c.stroke();}
+  else{c.fillStyle='rgba(230,238,250,.10)';c.fillRect(0,0,W,H);c.fillStyle='rgba(255,255,255,.9)';for(let i=0;i<70;i++){const s=.5+hash(i,4),y=((hash(9,i)+n/(7000/s))%1)*(H+20)-10,x=(hash(i,2)*W+Math.sin(n/900+i)*14)%W;c.beginPath();c.arc(x,y,1.2+s,0,6.283);c.fill();}}
+  c.restore();}
+
+/* ---------- daily login calendar: a 7-day track ---------- */
+const LOGIN=[
+ ['10 energy',()=>{S.energy+=10;}],
+ ['Goods',()=>{S.goods+=20*S.lvl;},()=>num(20*S.lvl)+' goods'],
+ ['1 koban',()=>{S.koban+=1;}],
+ ['15 energy',()=>{S.energy+=15;}],
+ ['2 koban',()=>{S.koban+=2;}],
+ ['A free Lucky Draw',()=>{gachaS().free=(gachaS().free|0)+1;}],
+ ['Seasonal decoration + 2 koban',()=>{S.koban+=2;const e=ENV(),own=new Set(S.b.map(b=>b.type).concat((S.store||[]).map(r=>r.type))),it=Object.values(DEFS).find(d=>d.season===e.season&&d.cat==='decor'&&!own.has(d.id));
+   if(it){S.store=S.store||[];S.store.push({id:S.nid++,type:it.id,lv:1,cnt:0});toast(it.n+' is in Build → Storage.');}else S.koban+=3;}]];
+function loginS(){if(!S.login||typeof S.login!=='object')S.login={d:'',i:0};return S.login;}
+const loginDue=()=>loginS().d!==today();
+function openLogin(auto){const L=loginS(),due=loginDue(),i=L.i%7;
+  const box=(k)=>{const done=k<i||(k===i&&!due),cur=k===i&&due,lbl=LOGIN[k][2]?LOGIN[k][2]():LOGIN[k][0];return '<div class="lday'+(done?' done':'')+(cur?' cur':'')+(k===6?' big':'')+'"><b>Day '+(k+1)+'</b><span>'+lbl+'</span>'+(done?'<i>✓</i>':'')+'</div>';};
+  modal('<h2>Daily Rewards</h2><p>Come back each day. Day 7 gives a seasonal decoration!</p><div class="lgrid">'+[0,1,2,3,4,5,6].map(box).join('')+'</div>'+(due?'':'<p class="gnote">Come back tomorrow for Day '+((i%7)+1)+'.</p>'),
+    due?[{label:'Claim Day '+(i+1),cls:'primary',fn:()=>{LOGIN[i][1]();L.d=today();L.i=(i+1)%7;S.c.logins=(S.c.logins||0)+1;save();updHUD();rewardFx('Day '+(i+1)+': '+(LOGIN[i][2]?LOGIN[i][2]():LOGIN[i][0])+'!');}}]:[{label:'OK',cls:'primary'}]);}
+
+/* ---------- weekly score, weekly leaderboard and the Friends Festival ---------- */
+const WKU0=Date.UTC(2026,9,26),WEEK_MS=7*864e5;
+const wkKey=o=>'w'+(Math.floor((Date.now()-WKU0)/WEEK_MS)+(o||0));
+const wkEnd=()=>WKU0+(Math.floor((Date.now()-WKU0)/WEEK_MS)+1)*WEEK_MS;
+const WP=[['harvest',1],['collect',1],['rent',1],['orders',10],['vip',20],['daily',5],['help',5],['gifts',3]];
+function wkS(){const k=wkKey();if(!S.wk||S.wk.k!==k){const prev=S.wk&&S.wk.k?S.wk.k:null;S.wk={k,base:{},prev,coop:[]};for(const [c] of WP)S.wk.base[c]=(S.c&&S.c[c])||0;}return S.wk;}
+const wkPts=()=>{const w=wkS();let p=0;for(const [c,m] of WP)p+=Math.max(0,((S.c&&S.c[c])||0)-(w.base[c]||0))*m;return p;};
+const WK_T=[[1,'Weekly Champion',6],[3,'Weekly Star',4],[10,'Weekly Top 10',2]];
+let wkChecking=false;
+async function weeklyReward(){const w=wkS();if(!w.prev||!cloudUser||!window.cloud||visiting||wkChecking)return;S.wkDone=S.wkDone||{};if(S.wkDone[w.prev])return;wkChecking=true;
+  try{const rows=await window.cloud.loadBoard('wk_'+w.prev),me=window.cloud.uid(),r=rows.findIndex(x=>x.uid===me&&(x['wk_'+w.prev]|0)>0);S.wkDone[w.prev]=1;
+    if(r>=0&&r<10){const [,t,k]=WK_T.find(q=>r<q[0]);S.koban+=k;if(!S.titles.includes(t))S.titles.push(t);save();modal('<div class="big">'+TANUKI+'</div><h2>Last week you were #'+(r+1)+'!</h2><p>Out of every mayor in Japan. +'+k+' koban.</p><p>Title: '+ttlHTML(t)+'</p>',[{label:'Wear it',fn:()=>{S.title=t;save();pushBoard();updPlate();}},{label:'Great!',cls:'primary'}]);}
+    else save();}catch(e){console.warn('weekly reward',e);}wkChecking=false;}
+/* Friends Festival: you and your friends fill one goal together each week */
+const COOP=[[1000,'2 koban',()=>{S.koban+=2;}],[3000,'4 koban',()=>{S.koban+=4;}],[8000,'A free Lucky Draw + 4 koban',()=>{S.koban+=4;gachaS().free=(gachaS().free|0)+1;}]];
+function coopSum(){const k=wkKey();let s=wkPts();for(const f of S.friends||[])if(f.wkK===k)s+=f.wk|0;return s;}
+function coopHTML(){const w=wkS(),s=coopSum(),top=COOP[COOP.length-1][0];
+  return '<div class="coop"><b>Friends Festival</b> <small>this week · ends in '+fmt((wkEnd()-Date.now())/1000)+'</small><span class="gbar"><i style="width:'+Math.min(100,s/top*100)+'%"></i></span><small>'+num(s)+' points from you and your friends (you: '+num(wkPts())+')</small><div class="ctiers">'+
+    COOP.map(([need2,lbl],i)=>'<span class="ctier'+(w.coop.includes(i)?' done':'')+'">'+num(need2)+': '+lbl+(w.coop.includes(i)?' ✓':s>=need2?' <button class="btn mini primary" data-coop="'+i+'">Claim</button>':'')+'</span>').join('')+'</div><small>Points: harvest, collect or rent 1 · merchant order 10 · daily mission 5 · help a friend 5 · gift 3 · VIP 20</small></div>';}
+function claimCoop(i){const w=wkS();if(w.coop.includes(i)||coopSum()<COOP[i][0])return;w.coop.push(i);COOP[i][2]();save();rewardFx('Friends Festival reward: '+COOP[i][1]+'!');}
+/* gifts: send spare goods or ingredients to a friend (they are moved, never created) */
+const GIFT_DAY=3,GIFT_GOODS=300,GIFT_ING=30;
+function giftS(){if(!S.gift||S.gift.d!==today())S.gift={d:today(),n:0,to:[]};return S.gift;}
+function openGift(f){const g=giftS();if(g.n>=GIFT_DAY){toast('You can send '+GIFT_DAY+' gifts a day. Try again tomorrow.');return;}if(g.to.includes(f.uid)){toast('You already sent Mayor '+f.name+' a gift today.');return;}
+  const opts=[['goods',GIFT_GOODS,'Goods']].concat(Object.keys(ING).map(k=>[k,GIFT_ING,ING[k].n]));
+  modal('<h2>Gift for Mayor '+esc(f.name)+'</h2><p>The gift comes from your own storehouse. '+(GIFT_DAY-g.n)+' gift'+(GIFT_DAY-g.n>1?'s':'')+' left today.</p><ol class="board goals">'+opts.map(([k,a,nm])=>{const have=k==='goods'?S.goods:ingOf(k);return '<li><span class="rk ingico">'+(k==='goods'?ICO_GOODS:ING_SVG[k])+'</span><span class="who"><span class="nm">'+num(a)+' '+nm+'</span><span class="tw">You have '+num(have)+'</span></span><span class="val">'+(have>=a?'<button class="btn mini primary" data-gift="'+k+'">Send</button>':'')+'</span></li>';}).join('')+'</ol>',
+    [{label:'Close',cls:'primary'}],card=>card.querySelectorAll('[data-gift]').forEach(b=>b.onclick=async()=>{const k=b.dataset.gift,a=k==='goods'?GIFT_GOODS:GIFT_ING,gg=giftS();if((k==='goods'?S.goods:ingOf(k))<a||gg.n>=GIFT_DAY)return;b.disabled=true;
+      try{await window.cloud.sendHelp(f.uid,{fromName:clean(S.name,20)||'A mayor',kind:'gift',g:k,a});if(k==='goods')S.goods-=a;else S.ing[k]-=a;gg.n++;gg.to.push(f.uid);S.c.gifts=(S.c.gifts||0)+1;save();nextModal();toast('Gift sent to Mayor '+f.name+'!');}
+      catch(e){console.warn(e);b.disabled=false;toast('The gift could not be sent. Check the Firestore rules.');}}));}
+
+/* ---------- Town Gate → train station ---------- */
+const GATE_AP=[0,60,150];
+function railTrack(x,y){for(let i=0;i<6;i++){const a=P(x+i/6+.02,y-.07,.3),c=P(x+i/6+.02,y+.07,.3);ln(a,c,'#6b4426',1.6);}ln(P(x,y-.05,.8),P(x+1,y-.05,.8),'#9aa3b2',.9);ln(P(x,y+.05,.8),P(x+1,y+.05,.8),'#9aa3b2',.9);}
+function trainCar(x0,y,len,z,body,stripe,roof,bullet,first){const x1=x0+len;box(x0,y-.1,len,.2,z,9,body);fy(x0+.04,x1-.04,y+.1,z+2.6,z+4.4,stripe);
+  for(let i=0;i<Math.floor(len/.16);i++){const a=x0+.07+i*.16;fy(a,a+.09,y+.102,z+5.2,z+7.6,'rgba(170,215,240,.95)');}
+  box(x0+.02,y-.08,len-.04,.16,z+9,1.4,roof);
+  if(bullet&&first){poly([P(x1,y-.1,z),P(x1+.34,y,z+1.5),P(x1,y+.1,z),P(x1,y+.1,z+9),P(x1,y-.1,z+9)],body,OUT);poly([P(x1,y+.1,z+5),P(x1+.26,y+.02,z+3),P(x1,y+.1,z+8)],'#2b3a5a',false);}}
+function stationTrain(b,n,L){const x=b.x,y=b.y+.86,cyc=32000,t=(n+b.id*977)%cyc;let u;if(t<5000)u=-3.2+3.2*Math.pow(t/5000,.5);else if(t<12000)u=0;else if(t<17000)u=3.4*Math.pow((t-12000)/5000,2);else return;
+  const cars=L>=3?3:2,len=L>=3?.95:.8;for(let i=cars-1;i>=0;i--){const x0=x+u-i*(len+.04)+.08;if(x0>x+3.5||x0+len<x-3)continue;
+    if(L>=3)trainCar(x0,y,len,1.4,'#f4f6f8','#2f6db0','#d9dee6',true,i===0);else trainCar(x0,y,len,1.4,'#e8dcb8','#3f8a4c','#8a9096',false,i===0);}
+  if(t>5000&&t<12000){const q=P(x+.5,b.y+.6,4);if((t/400|0)%2)ell(q[0],q[1]-14,1.4,1.4,'#ffe08a',false);}}
+function drawStation(b,n){const x=b.x,y=b.y,L=lvOf(b);shadowT(x+.5,y+.4,15);for(let i=-2;i<=2;i++)railTrack(x+i,y+.86);
+  if(L===2){box(x+.05,y+.58,.9,.18,0,3,'#b9b2a2');box(x+.12,y+.1,.62,.42,0,15,'#efe6d2');fy(x+.32,x+.52,y+.522,0,10,'#5a3b28');fx(y+.18,y+.44,x+.742,5,11,'rgba(255,214,120,.8)');hip(x+.08,y+.06,.7,.5,15,9,.08,'#3f6b4a');
+    const c=P(x+.43,y+.522,13);ell(c[0],c[1],2.6,2.6,'#fbf8f0','#1c2541');ln([c[0],c[1]],[c[0],c[1]-1.8],'#1c2541',.6);ln([c[0],c[1]],[c[0]+1.4,c[1]],'#1c2541',.6);
+    for(const a of [.16,.84]){box(x+a-.015,y+.64,.03,.03,3,12,'#5a391f');}box(x+.1,y+.6,.8,.12,15,1.6,'#3f6b4a');const s=P(x+.5,y+.66,13);ctx.fillStyle='#fbf8f0';ctx.fillRect(s[0]-7,s[1]-3,14,4);ctx.strokeStyle='#1c2541';ctx.lineWidth=.5;ctx.strokeRect(s[0]-7,s[1]-3,14,4);
+    const lp=P(x+.86,y+.3,0);ln(lp,[lp[0],lp[1]-17],'#2b2b2e',1.2);ell(lp[0],lp[1]-18,1.8,1.8,'#ffe08a',false);light(lp[0],lp[1]-18,12,'warm',.8);}
+  else{box(x+.03,y+.56,.94,.22,0,4,'#d0d4da');box(x+.06,y+.08,.82,.44,0,20,'#f4f6f8');fy(x+.12,x+.82,y+.522,4,17,'rgba(170,215,240,.85)');for(let i=1;i<6;i++)ln(P(x+.12+i*.117,y+.523,4),P(x+.12+i*.117,y+.523,17),'#9aa3b2',.6);
+    fx(y+.14,y+.46,x+.882,6,17,'rgba(170,215,240,.85)');box(x+.04,y+.06,.86,.48,20,2,'#2f6db0');
+    ctx.beginPath();const r0=P(x+.02,y+.6,22),r1=P(x+.98,y+.6,22),r2=P(x+.98,y+.76,22),r3=P(x+.02,y+.76,22);ctx.moveTo(r0[0],r0[1]);ctx.quadraticCurveTo((r0[0]+r1[0])/2,(r0[1]+r1[1])/2-6,r1[0],r1[1]);ctx.lineTo(r2[0],r2[1]);ctx.quadraticCurveTo((r2[0]+r3[0])/2,(r2[1]+r3[1])/2-6,r3[0],r3[1]);ctx.closePath();ctx.fillStyle='rgba(220,232,245,.75)';ctx.fill();ctx.strokeStyle='#9aa3b2';ctx.lineWidth=.8;ctx.stroke();
+    for(const a of [.1,.5,.9])ln(P(x+a,y+.68,4),P(x+a,y+.68,22),'#9aa3b2',1);
+    const lg=P(x+.47,y+.3,24);ctx.fillStyle='#2f6db0';ctx.fillRect(lg[0]-10,lg[1]-6,20,6);ell(lg[0]-6,lg[1]-3,2,2,'#fbf8f0',false);light(lg[0],lg[1]-3,16,'cool',.8);
+    for(const a of [.2,.8]){const q=P(x+a,y+.72,22);ell(q[0],q[1]+2,2,1,'#ffe08a',false);light(q[0],q[1]+2,10,'warm',.7);}}
+  stationTrain(b,n,L);}
+const gateAp=()=>{const g=S.b.find(b=>DEFS[b.type].gate);return g?GATE_AP[lvOf(g)-1]:0;};
+{const G0=DR.gate;DR.gate=function(b,n,pr){if(lvOf(b)<2)return G0(b,n,pr);drawStation(b,n);};}
 let goalsTab='daily';
 function openGoals(tabName){if(visiting)return;if(tabName)goalsTab=tabName;
   modal('<h2>Mayor\'s Goals</h2><div class="kbal">'+KOBAN+'<b id="gKoban">'+S.koban+'</b> koban</div><div class="btabs" id="gTabs"><button class="tab" data-g="daily">Daily</button><button class="tab" data-g="orders">Orders</button><button class="tab" data-g="book">Book</button><button class="tab" data-g="ach">Achievements</button><button class="tab" data-g="shop">Treasure</button></div><div id="gBody"></div>',
@@ -3169,7 +3264,7 @@ function renderGoals(card){const body=card.querySelector('#gBody');if(!body)retu
   const bar=(v,t)=>'<span class="gbar"><i style="width:'+Math.min(100,v/t*100)+'%"></i></span>';
   let h='';
   if(goalsTab==='daily'){const dl=dailyNow(),st=S.streak||{n:0,last:''},left=(new Date(new Date().setHours(24,0,0,0))-new Date())/1000;
-    h='<ol class="board goals">'+vipRow()+dl.ids.map((id,i)=>{const m=DPOOL.find(q=>q.id===id),v=Math.min(dProg(i),dl.t[i]),done=v>=dl.t[i];
+    h='<ol class="board goals">'+'<li><span class="rk">◆</span><span class="who"><span class="nm">Daily reward · Day '+((loginS().i%7)+(loginDue()?1:0)||7)+' of 7</span><span class="tw">'+(loginDue()?'Ready to claim':'Claimed today. Come back tomorrow')+'</span></span><span class="val"><button class="btn mini'+(loginDue()?' primary':'')+'" id="gLogin">'+(loginDue()?'Claim':'View')+'</button></span></li>'+vipRow()+dl.ids.map((id,i)=>{const m=DPOOL.find(q=>q.id===id),v=Math.min(dProg(i),dl.t[i]),done=v>=dl.t[i];
       return '<li><span class="rk">'+(i+1)+'</span><span class="who"><span class="nm">'+m.n(dl.t[i])+'</span><span class="tw">'+bar(v,dl.t[i])+num(v)+' / '+num(dl.t[i])+' · 1 koban + 5 energy</span></span><span class="val">'+(dl.claimed[i]?'Done':done?'<button class="btn mini primary" data-d="'+i+'">Claim</button>':'')+'</span></li>';}).join('')+
       '<li class="bonus"><span class="rk">★</span><span class="who"><span class="nm">Finish all 3 missions</span><span class="tw">3 koban · 7-day streak gives +10 more</span></span><span class="val">'+(dl.bonus?'Done':dl.claimed.every(Boolean)?'<button class="btn mini primary" id="gBonus">Claim</button>':'')+'</span></li></ol>'+
       '<p class="gnote">Streak: <b>'+(st.last===today()||st.last===dayKey(-1)?st.n:0)+' days</b> · New missions in '+fmt(left)+'</p>';}
@@ -3191,6 +3286,7 @@ function renderGoals(card){const body=card.querySelector('#gBody');if(!body)retu
   const gb=body.querySelector('#gBonus');if(gb)gb.onclick=()=>{claimBonus();renderGoals(card);};
   body.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{claimAch(ACH[+b.dataset.a]);renderGoals(card);});
   if(goalsTab==='book')bookBind(body);
+  {const gl=body.querySelector('#gLogin');if(gl)gl.onclick=()=>{nextModal();openLogin();};}
   {const gv=body.querySelector('#gVip');if(gv)gv.onclick=()=>{claimVip();renderGoals(card);};}
   body.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{fillOrder(+b.dataset.o);renderGoals(card);});
   body.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{skipOrder(+b.dataset.k);renderGoals(card);});
@@ -3204,7 +3300,7 @@ $('#drawBtn').onclick=()=>openDraw();
 $('#plate').onclick=e=>{e.stopPropagation();openGoals('ach');};
 document.querySelector('.panel.lvl').onclick=()=>{if(EXAMS[S.lvl+1])openExam();};
 
-setInterval(()=>{tickEnergy(Date.now());recompute();updHUD();updClock();if(!visiting&&!mOpen&&S.tips&&S.tips.seasons&&S.lastSea!==ENV().season)seasonNews(false);if(!visiting){S.c.maxTour=Math.max(S.c.maxTour||0,D.tourists);updGoalsBtn();}updQuest();updSheet();updEvent();updPlate();examTick();if(!$('#drawer').hidden){document.querySelectorAll('.card').forEach(c=>{const d=DEFS[c.dataset.t];c.classList.toggle('poor',S.lvl>=d.lvl&&(S.yen<d.cost||S.goods<gcost(d)||!!(d.candy&&E().candy<d.candy)||!!(d.koban&&S.koban<d.koban)));});}},250);
+setInterval(()=>{tickEnergy(Date.now());recompute();updHUD();updClock();if(!visiting&&!mOpen&&S.tips&&S.tips.seasons&&S.lastSea!==ENV().season)seasonNews(false);if(!visiting){S.c.maxTour=Math.max(S.c.maxTour||0,D.tourists);updGoalsBtn();}updQuest();updSheet();updEvent();updPlate();examTick();if(!visiting&&!planning&&!mOpen&&S.tutOff&&loginDue()&&loginS().shown!==today()){loginS().shown=today();openLogin(true);}if(!$('#drawer').hidden){document.querySelectorAll('.card').forEach(c=>{const d=DEFS[c.dataset.t];c.classList.toggle('poor',S.lvl>=d.lvl&&(S.yen<d.cost||S.goods<gcost(d)||!!(d.candy&&E().candy<d.candy)||!!(d.koban&&S.koban<d.koban)));});}},250);
 
 /* ---------- guided tutorial: a glowing ring and an arrow show where to tap for the first five requests ---------- */
 let tutT=null,TUT=null;
